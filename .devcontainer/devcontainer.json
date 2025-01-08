@@ -1,0 +1,33 @@
+{
+  "name": "Azure Functions & Node.js",
+  "build": {
+    "dockerfile": "Dockerfile",
+    // Update 'VARIANT' to pick a Node.js version: 10, 12
+    "args": {
+      "VARIANT": "20"
+    }
+  },
+  "forwardPorts": [7071],
+
+  // Add the IDs of extensions you want installed when the container is created.
+  "customizations": {
+    "vscode": {
+      // Bug fix on Mac: https://github.com/microsoft/vscode-remote-release/issues/8169
+      "settings": {
+        "extensions.verifySignature": false
+      },
+      "extensions": [
+        "ms-azuretools.vscode-azurefunctions",
+        "dbaeumer.vscode-eslint",
+        "eamodio.gitlens",
+        "humao.rest-client"
+      ]
+    }
+  },
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // "postCreateCommand": "npm install",
+
+  // Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+  "remoteUser": "node"
+}
