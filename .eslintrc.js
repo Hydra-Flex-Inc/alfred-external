@@ -12,6 +12,7 @@ module.exports = {
   rules: {
     semi: ["error", "always"],
     "keyword-spacing": ["error", {}],
+    "no-trailing-spaces": ["error"],
 
     quotes: 0,
     camelcase: 0,

@@ -7,8 +7,24 @@
     "test": "echo \"No tests yet...\""
   },
   "dependencies": {
-    "@azure/functions": "^4.0.0"
+    "@azure/functions": "^4.0.0",
+    "@azure/storage-blob": "^12.26.0",
+    "@sendgrid/mail": "^8.1.4",
+    "cookie": "^1.0.2",
+    "crypto": "^1.0.1",
+    "jimp": "^1.6.0",
+    "jsonwebtoken": "^9.0.2",
+    "parse-multipart": "^1.0.4",
+    "pg": "^8.13.1",
+    "validatorjs": "^3.22.1"
   },
-  "devDependencies": {},
-  "main": "src/{index.js,src/functions/**/*.js}"
+  "main": "src/{functions/**/*.js, index.js,}",
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.6.0",
+    "eslint-plugin-vue": "^9.32.0"
+  }
 }
