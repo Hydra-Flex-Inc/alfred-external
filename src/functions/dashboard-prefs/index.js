@@ -2,13 +2,13 @@ const { app } = require("@azure/functions");
 const db = require("../../../db");
 const ErrorHandler = require("../../../errorHandler");
 const Auth = require("../../../auth");
-const ParseRequest = require("../../../parseRequest");
+const Common = require("../../../common");
 
 app.http("dashboard-prefs", {
   methods: ["GET", "POST"],
   handler: async (req, context) => {
     try {
-      req = ParseRequest.parse(req);
+      req = Common.parseRequest(req);
 
       // Retrieve the authorized user.
       const authorizedUser = await Auth.authorizeUser(req, db, {

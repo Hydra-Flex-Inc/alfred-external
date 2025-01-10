@@ -3,7 +3,7 @@ const db = require("../../../db");
 const Validator = require("../../../validator");
 const Auth = require("../../../auth");
 const ErrorHandler = require("../../../errorHandler");
-const ParseRequest = require("../../../parseRequest");
+const Common = require("../../../common");
 
 const containerFullLevel = 40;
 
@@ -130,7 +130,7 @@ app.http("chem-sense", {
   methods: ["GET"],
   handler: async (req, context) => {
     try {
-      req = ParseRequest.parse(req);
+      req = Common.parseRequest(req);
       // req.headers.forEach((value, name) => {
       //   if (name === "cookie") {
       //     req.headers.cookie = value;

@@ -1,0 +1,56 @@
+### Good upload
+
+POST http://localhost:7071/api/profile-picture
+content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="test-img.png"
+Content-Type: image/png
+
+< ./test-img.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Missing body payload
+
+POST http://localhost:7071/api/profile-picture
+content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+
+### DELETE
+
+DELETE http://localhost:7071/api/profile-picture
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
+
+
+### PRODUCTION ###
+
+POST https://alfred-api.hydraflexinc.com/alfred/profile-picture
+content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="test-img.png"
+Content-Type: image/png
+
+< ./test-img.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+
+### Direct to Azure Function ###
+
+POST https://hfiq-alfred-external.azurewebsites.net/api/profile-picture
+?code=secret
+content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="test-img.png"
+Content-Type: image/png
+
+< ./test-img.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###

@@ -5,14 +5,14 @@ const Auth = require("../../../auth");
 const db = require("../../../db");
 const Validator = require("../../../validator");
 const ErrorHandler = require("../../../errorHandler");
-const ParseRequest = require("../../../parseRequest");
+const Common = require("../../../common");
 
 app.http("back-office-wash-package-list", {
   methods: ["GET"],
   handler: async (req, context) => {
     context.log("Processing request to calculate cost per wash.");
     try {
-      req = ParseRequest.parse(req);
+      req = Common.parseRequest(req);
       // Retrieve the authorized user.
       const authorizedUser = await Auth.authorizeUser(req, db, {
         requireBusinessId: true,

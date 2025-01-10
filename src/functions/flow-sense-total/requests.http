@@ -1,1 +1,60 @@
-GET http://localhost:7071/api/flow-sense-total?name=bub
+
+### Normal simple working, timebucketed
+
+GET http://localhost:7071/api/flow-sense-total
+    ?gatewayId=advm2-sensor-trial
+    &bucketMinutes=60
+    # &start=2021-09-01T00:00:00Z
+    # &end=2021-09-01T00:00:01Z
+    # &dev=true
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+### Trigger dev mode
+GET http://localhost:7071/api/flow-sense-total
+    ?gatewayId=advm2-sensor-trial
+    &bucketMinutes=60
+    &start=2021-09-01T00:00:00Z
+    &end=2021-09-01T00:00:01Z
+    &dev=true
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+### Bad: bucketMinutes is required
+
+GET http://localhost:7061/api/flow-sense-total
+    ?gatewayId=advm2-sensor-trial
+
+content-type: application/json
+
+###
+
+GET https://alfred-api.hydraflexinc.com/alfred/flow-sense-total
+    ?gatewayId=01230981D34CA32AEE
+    &bucketMinutes=1440
+    &start=2023-12-31T18:30:00Z
+    &end=2024-04-29T11:41:23.589Z
+    &dev=0
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+###
+
+GET https://alfred-api.hydraflexinc.com/alfred/flow-sense-total
+    ?gatewayId=advm2-sensor-trial
+    &bucketMinutes=1440
+    &start=2023-11-10T18:30:00.000Z
+    &end=2024-05-09T10:45:45.212Z
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+###
+
+GET https://alfred-api.hydraflexinc.com/alfred/flow-sense-total
+    ?gatewayId=advm2-sensor-trial
+    &bucketMinutes=1440
+    &start=2024-04-23T18:30:00.000Z
+    &end=2024-05-09T10:45:45.212Z
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+

@@ -3,16 +3,15 @@ const db = require("../../../db");
 const Validator = require("../../../validator");
 const Auth = require("../../../auth");
 const ErrorHandler = require("../../../errorHandler");
-const ParseRequest = require("../../../parseRequest");
+const Common = require("../../../common");
 
 app.http("back-office-association-code", {
   methods: ["GET", "POST"],
   handler: async (req, context) => {
     try {
-      req = await ParseRequest.parse(req);
+      req = await Common.parseRequest(req);
       // Authorize and retrieve the user making the request.
       // We don't need to use this object later, but we need to make sure the user is legit.
-      // eslint-disable-next-line no-unused-vars
       await Auth.authorizeUser(req, db);
       const body = await req.json();
       const validator = new Validator(body, {

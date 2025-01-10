@@ -1,4 +1,3 @@
-/* eslint-disable space-before-function-paren */
 const { BlobServiceClient } = require("@azure/storage-blob");
 const crypto = require("crypto");
 const Jimp = require("jimp");
@@ -22,6 +21,8 @@ module.exports = {
     const random_str = crypto.randomBytes(5).toString("hex");
     const new_file_url = `${userId}-${random_str}.png`;
     const blockBlobClient = containerClient.getBlockBlobClient(new_file_url);
+    console.log("file", file);
+    console.log("Jimp", Jimp);
 
     const image = await Jimp.read(file);
     const resizedImage = image.resize(250, Jimp.AUTO);

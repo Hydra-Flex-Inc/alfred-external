@@ -2,16 +2,14 @@ const { app } = require("@azure/functions");
 const db = require("../../../db");
 const ErrorHandler = require("../../../errorHandler");
 const Auth = require("../../../auth");
-const ParseRequest = require("../../../parseRequest");
+const Common = require("../../../common");
 
 app.http("chemical-list", {
   methods: ["GET"],
   handler: async (req, context) => {
     try {
-      req = ParseRequest.parse(req);
+      req = Common.parseRequest(req);
       // Retrieve the authorized user.
-      // eslint-disable-next-line no-unused-vars
-      console.log("req", req.headers);
       await Auth.authorizeUser(req, db, {
         requireBusinessId: true,
       });

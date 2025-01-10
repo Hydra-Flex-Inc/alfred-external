@@ -1,0 +1,18 @@
+### Simple
+
+GET http://localhost:7071/api/maintenance-events
+    ?lid=d8c315a6-2288-3eee-4c2c-4773a46b782e
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+### No location ID specified
+GET http://localhost:7071/api/maintenance-events
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+### Specifying the number of rows to return. Default is 30000
+GET http://localhost:7071/api/maintenance-events
+    ?count=100
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+

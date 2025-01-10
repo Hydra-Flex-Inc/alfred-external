@@ -1,0 +1,39 @@
+### Simple, should limit at two hours' worth or data
+
+GET http://localhost:7071/api/gateway-status
+    ?deviceId=advm2-sensor-trial
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+### With a since
+
+GET http://localhost:7071/api/gateway-status
+    ?deviceId=advm2-sensor-trial
+    &since=1710510000
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+### With a bucketMinutes
+
+GET http://localhost:7071/api/gateway-status
+    ?deviceId=advm2-sensor-trial
+    &since=1710510000
+    &bucketMinutes=10
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+### With start and end times
+
+GET http://localhost:7071/api/gateway-status
+    ?deviceId=advm2-sensor-trial
+    &start=2024-01-01T00:00:00Z
+    &end=2024-03-25T00:00:00Z
+    &bucketMinutes=360
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+### No deviceId
+GET http://localhost:7071/api/gateway-status
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
