@@ -1,0 +1,79 @@
+### Simple call
+GET http://localhost:7071/api/dashboard-prefs
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+### Simple edit call
+POST http://localhost:7071/api/dashboard-prefs
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+{
+  "desktop_json": [
+    {
+      "widgetId": 1,
+      "label": "Today’s Wash Packages",
+      "column": 1,
+      "position": 1,
+      "type": "GRAPH",
+      "timeFilter": "TODAY",
+      "widgetConfig": {
+        "washPackageId": "8C56A152-FA9F-4B07-A850-CE7E2A04D4D2"
+      },
+      "category": "WASHPACKAGE"
+    }
+  ],
+  "mobile_json": [
+    {
+      "widgetId": 1,
+      "column": 1,
+      "position": 1,
+      "type": "KPI",
+      "timeFilter": "TODAY",
+      "category": "AQUALAB3"
+    }
+  ]
+}
+
+### Simple only one
+POST http://localhost:7071/api/dashboard-prefs
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+{
+  "mobile_json": [
+    {
+      "widgetId": 1,
+      "column": 1,
+      "position": 1,
+      "type": "KPI",
+      "timeFilter": "TODAY",
+      "category": "AQUALAB3"
+    },
+    {
+      "widgetId": 1,
+      "column": 1,
+      "position": 2,
+      "type": "KPI",
+      "timeFilter": "CUSTOM",
+      "customDate": {
+        "startDate": "2024-01-01Z00:00:00Z",
+        "endDate": "2024-04-01Z00:00:00Z"
+      },
+      "category": "AQUALAB3"
+    }
+  ]
+}
+
+
+### Should cause an error, there has to be atleast one update
+POST http://localhost:7071/api/dashboard-prefs
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+{}
+
+### Should fail since method is not supported
+DELETE http://localhost:7071/api/dashboard-prefs
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0

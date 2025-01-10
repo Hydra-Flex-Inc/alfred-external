@@ -20,5 +20,6 @@ module.exports = {
     "padded-blocks": 0,
     "comma-dangle": 0,
     "space-in-parens": 0,
+    "space-before-function-paren": "never",
   },
 };

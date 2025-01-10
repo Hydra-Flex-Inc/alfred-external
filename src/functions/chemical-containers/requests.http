@@ -1,0 +1,43 @@
+### working dev example
+
+GET http://localhost:7071/api/chemical-containers
+    ?gatewayId=advm2-sensor-trial
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=2f6d3b14-95e1-4fcd-90de-c52979efea6b
+
+### prod
+
+GET https://alfred-api.hydraflexinc.com/alfred/chemical-containers
+    ?gatewayId=01230981D34CA32AEE
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+
+
+
+
+
+
+
+
+###
+
+GET http://localhost:7071/api/chemical-containers
+    ?gatewayId=0123C489F5D9F652EE
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+
+###
+
+GET https://alfred-api.hydraflexinc.com/alfred/chemical-containers
+    ?gatewayId=0123C489F5D9F652EE
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+### 
+
+GET https://alfred-api.hydraflexinc.com/chem-sense/chemical-containers
+    ?gatewayId=0123C489F5D9F652EE
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0

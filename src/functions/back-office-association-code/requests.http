@@ -1,0 +1,36 @@
+### Good request
+
+POST http://localhost:7071/api/back-office-association-code
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+{
+    "location_id": "d8c315a6-2288-3eee-4c2c-4773a46b782e"
+}
+
+### Bad request: Invalid location_id
+
+POST http://localhost:7071/api/back-office-association-code
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+{
+    "location_id": "b7732562-c457-47f0-921d-f69bbc487983"
+}
+
+### Bad request: Missing location_id
+
+POST http://localhost:7071/api/back-office-association-code
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+
+### Working prod example
+
+POST https://alfred-api.hydraflexinc.com/alfred/back-office-association-code
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+{
+    "location_id": "afc0ef89-119a-409e-9c02-a7a048786062"
+}

@@ -1,0 +1,17 @@
+### Simple call
+GET http://localhost:7071/api/chemical-list
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+
+### Should fail since method is not supported
+DELETE http://localhost:7071/api/chemical-list
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+
+### PROD; Good
+GET https://alfred-api.hydraflexinc.com/alfred/chemical-list
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+

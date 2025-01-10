@@ -2,8 +2,8 @@ const { app } = require("@azure/functions");
 const db = require("../../../db");
 const Validator = require("../../../validator");
 const Auth = require("../../../auth");
-const errorHandler = require("../../../errorHandler");
-const parseRequest = require("../../../parseRequest");
+const ErrorHandler = require("../../../errorHandler");
+const ParseRequest = require("../../../parseRequest");
 
 const containerFullLevel = 40;
 
@@ -130,7 +130,7 @@ app.http("chem-sense", {
   methods: ["GET"],
   handler: async (req, context) => {
     try {
-      req = parseRequest.parse(req);
+      req = ParseRequest.parse(req);
       // req.headers.forEach((value, name) => {
       //   if (name === "cookie") {
       //     req.headers.cookie = value;
@@ -622,7 +622,9 @@ app.http("chem-sense", {
 
       return { body: JSON.stringify(out) };
     } catch (error) {
-      throw new Error(errorHandler.prepareResponse(context, error));
+      return {
+        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
+      };
     }
   },
 });

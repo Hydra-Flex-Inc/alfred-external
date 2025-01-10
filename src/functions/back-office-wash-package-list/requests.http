@@ -1,0 +1,84 @@
+
+### Valid
+
+GET http://localhost:7071/api/back-office-wash-package-list
+    ?lid=afc0ef89-119a-409e-9c02-a7a048786062
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+### Bad? no start and end times
+
+GET http://localhost:7071/api/wash-summary
+    ?lid=0cb02c84-e1a7-232c-bc4f-23af4be3c19f
+    &dateFormat=month
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+### Bad: no cookie
+
+GET http://localhost:7071/api/wash-summary
+    ?lid=0cb02c84-e1a7-232c-bc4f-23af4be3c19f
+    &start=2024-01-01T00:00:00Z
+    &end=2024-03-31T00:00:00Z
+    &dateFormat=month
+content-type: application/json
+
+### BAD: Unsupported dateFormat
+
+GET http://localhost:7071/api/wash-summary
+    ?lid=0cb02c84-e1a7-232c-bc4f-23af4be3c19f
+    &start=2023-01-01T00:00:00Z
+    &end=2023-08-02T00:00:00Z
+    &dateFormat=monkey
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+### Bad: Too long a time period
+
+GET http://localhost:7071/api/wash-summary
+    ?lid=0cb02c84-e1a7-232c-bc4f-23af4be3c19f
+    &start=2024-01-01T00:00:00Z
+    &end=2024-04-31T00:00:00Z
+    &dateFormat=month
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+
+### Prod example
+
+GET https://alfred-api.hydraflexinc.com/alfred/back-office-wash-package-list
+    ?lid=afc0ef89-119a-409e-9c02-a7a048786062
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+
+
+### Development URLs for understanding the data
+
+GET https://api.sonnyscontrols.com/v1/596/1/wash/item-sellable-list
+Sonnys-Support-Api-Key: secret
+
+###
+
+GET https://api.sonnyscontrols.com/v1/596/1/addon/item-sellable-list
+Sonnys-Support-Api-Key: secret
+
+
+###
+
+GET https://api.sonnyscontrols.com/v1/596/item-sale-list
+    ?siteId=1
+    &startDate=2024-03-01T00:00:00Z
+    &endDate=2024-04-01T00:00:00Z
+    &dateFormat=month
+Sonnys-Support-Api-Key: secret
+
+
+### broken bc ISO 8601 not properly supported
+
+GET https://api.sonnyscontrols.com/v1/596/item-sale-list
+?siteId=1
+&startDate=2024-03-25T06:23:20.529Z
+&endDate=2024-04-25T06:23:20.529Z
+&dateFormat=month
+Sonnys-Support-Api-Key: secret
