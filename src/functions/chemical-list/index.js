@@ -1,8 +1,8 @@
 const { app } = require("@azure/functions");
+const Common = require("../../../common");
 const db = require("../../../db");
 const ErrorHandler = require("../../../errorHandler");
 const Auth = require("../../../auth");
-const Common = require("../../../common");
 
 app.http("chemical-list", {
   methods: ["GET"],
