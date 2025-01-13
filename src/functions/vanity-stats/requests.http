@@ -1,0 +1,12 @@
+### Simple, no auth
+
+GET http://localhost:7071/api/vanity-stats
+content-type: application/json
+
+
+### Prod, no auth
+
+GET https://alfred-api.hydraflexinc.com/alfred/vanity-stats
+content-type: application/json
+
+

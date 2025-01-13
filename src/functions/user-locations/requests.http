@@ -1,0 +1,14 @@
+### Simple
+
+GET http://localhost:7071/api/user-locations
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+
+### Simple @ production
+
+GET https://alfred-api.hydraflexinc.com/alfred/user-locations
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+

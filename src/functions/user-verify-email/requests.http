@@ -1,0 +1,8 @@
+
+POST http://localhost:7071/api/user-verify-email
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
+
+{
+  "user_id": "b9bb743f-2a5f-440e-b4d4-f76cc3c02ed8"
+}
