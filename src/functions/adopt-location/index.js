@@ -12,6 +12,11 @@ app.http("adopt-location", {
 
     const name = request.query.get("name") || (await request.text()) || "world";
 
-    return { body: `Hello, ${name}!` };
+    return {
+      body: `Hello, ${name}!`,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
   },
 });

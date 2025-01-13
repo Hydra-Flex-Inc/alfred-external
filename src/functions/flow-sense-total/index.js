@@ -177,6 +177,9 @@ app.http("flow-sense-total", {
 
       return {
         body: JSON.stringify(out),
+        headers: {
+          "Content-Type": "application/json",
+        },
       };
     } catch (error) {
       // Handle errors

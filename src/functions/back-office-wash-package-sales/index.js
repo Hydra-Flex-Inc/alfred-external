@@ -185,6 +185,9 @@ app.http("back-office-wash-package-sales", {
           start: start_date.toISOString().replace(".000Z", "Z"),
           end: end_date.toISOString().replace(".000Z", "Z"),
         }),
+        headers: {
+          "Content-Type": "application/json",
+        },
       };
     } catch (error) {
       return {

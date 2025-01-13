@@ -132,7 +132,12 @@ app.http("panel-summary", {
       const result = await db.tsdbQuery(query, params);
       const out = result.rows.map((row) => ({ ...row, bucketMinutes }));
 
-      return { body: JSON.stringify(out) };
+      return {
+        body: JSON.stringify(out),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
     } catch (error) {
       return {
         body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),

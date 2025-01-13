@@ -80,6 +80,9 @@ app.http("location-components", {
 
       return {
         body: JSON.stringify(out),
+        headers: {
+          "Content-Type": "application/json",
+        },
       };
     } catch (error) {
       return {

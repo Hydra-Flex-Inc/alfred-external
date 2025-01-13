@@ -136,6 +136,9 @@ async function setDashboardPrefs(req, context) {
     // Return the success response
     return {
       body: JSON.stringify(currentPreferencesResult.rows[0]),
+      headers: {
+        "Content-Type": "application/json",
+      },
     };
   } else {
     // neither desktop_json nor mobile_json was valid

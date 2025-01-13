@@ -100,7 +100,12 @@ app.http("back-office-association-code", {
         out = insertResult.rows[0];
       }
 
-      return { body: JSON.stringify(out) };
+      return {
+        body: JSON.stringify(out),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
     } catch (error) {
       // Handle errors using a centralized error handler.
       return {

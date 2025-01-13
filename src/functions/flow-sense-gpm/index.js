@@ -197,6 +197,9 @@ app.http("flow-sense-gpm", {
       // context.log(out);
       return {
         body: JSON.stringify(out),
+        headers: {
+          "Content-Type": "application/json",
+        },
       };
     } catch (error) {
       // Handle errors

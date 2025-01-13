@@ -1,0 +1,9 @@
+### working dev example
+
+GET http://localhost:7071/api/sensor-data
+    # ?gatewayId=0123C489F5D9F652EE
+    ?gatewayId=advm2-sensor-trial
+    &start=2024-09-01T00:00:00-05:00
+    &end=2024-09-21T23:59:59-05:00
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3

@@ -75,7 +75,12 @@ app.http("maintenance-events", {
       for (const row of result.rows) {
         out.push(row);
       }
-      return { body: JSON.stringify(out) };
+      return {
+        body: JSON.stringify(out),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
     } catch (error) {
       return {
         body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),

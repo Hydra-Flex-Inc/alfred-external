@@ -21,7 +21,12 @@ app.http("chemical-list", {
       `);
 
       const chemicals = query.rows; // Assuming there's only one row per user
-      return { body: JSON.stringify(chemicals) };
+      return {
+        body: JSON.stringify(chemicals),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
     } catch (error) {
       // Handle errors
 

@@ -112,7 +112,12 @@ app.http("gateway-status", {
       // context.log(result.rows);
       const out = result.rows.map((row) => ({ ...row, bucketMinutes }));
 
-      return { body: JSON.stringify(out) };
+      return {
+        body: JSON.stringify(out),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
     } catch (error) {
       return {
         body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),

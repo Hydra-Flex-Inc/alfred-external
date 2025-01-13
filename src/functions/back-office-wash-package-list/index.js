@@ -158,6 +158,9 @@ app.http("back-office-wash-package-list", {
       });
       return {
         body: JSON.stringify([...washPackages, ...addons]),
+        headers: {
+          "Content-Type": "application/json",
+        },
       };
     } catch (error) {
       return {

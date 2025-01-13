@@ -74,7 +74,12 @@ app.http("chemical-containers", {
         d.car_wash_package_ids = [...new Set(d.car_wash_package_ids)];
       });
 
-      return { body: JSON.stringify(out) };
+      return {
+        body: JSON.stringify(out),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
     } catch (error) {
       // Handle errors
       return {

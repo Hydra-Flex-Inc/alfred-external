@@ -36,6 +36,9 @@ app.http("profile-picture", {
           );
           return {
             body: JSON.stringify({ message: "Profile picture deleted" }),
+            headers: {
+              "Content-Type": "application/json",
+            },
           };
         }
 

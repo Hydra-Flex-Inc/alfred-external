@@ -48,7 +48,12 @@ app.http("location-name", {
       } else {
         carWashName += ` (${req.query.gatewayId})`;
       }
-      return { body: JSON.stringify(carWashName) };
+      return {
+        body: JSON.stringify(carWashName),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
     } catch (error) {
       return {
         body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),

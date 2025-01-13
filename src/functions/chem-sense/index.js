@@ -620,7 +620,12 @@ app.http("chem-sense", {
           throw new Error(err);
         });
 
-      return { body: JSON.stringify(out) };
+      return {
+        body: JSON.stringify(out),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
     } catch (error) {
       return {
         body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
