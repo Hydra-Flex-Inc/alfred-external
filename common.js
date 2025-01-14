@@ -1,9 +1,6 @@
 const parseRequest = (req) => {
-  // If a cookie exists, set it on the headers object
   req.headers.forEach((value, name) => {
-    if (name === "cookie") {
-      req.headers.cookie = value;
-    }
+    req.headers[name] = value;
   });
 
   // Parse the query string into an object

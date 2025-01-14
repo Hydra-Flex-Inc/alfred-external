@@ -41,11 +41,12 @@ app.http("set-cookie", {
       }
 
       // Validate body
+      const body = await req.json();
 
       // Not using a check on uuid, even though the key is a uuid as I do
       // not want to give any indication as to the form of the key
       // Further, the freeflow check prevents code injection as used elsewhere
-      validator = new Validator(req.body, {
+      validator = new Validator(body, {
         dev_key: "freeflow",
       });
 
@@ -108,7 +109,7 @@ app.http("set-cookie", {
       const validLocalhost = () => {
         const valid =
           req?.headers?.origin?.startsWith("https://localhost") &&
-          req?.body?.dev_key === process.env.AUTHORIZED_DEV_KEY;
+          body?.dev_key === process.env.AUTHORIZED_DEV_KEY;
         if (valid) {
           context.log("Authorized a localhost instance");
         }
