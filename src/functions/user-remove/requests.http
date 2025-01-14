@@ -1,0 +1,8 @@
+### 
+POST http://localhost:7071/api/user-remove
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=8c680e06-0183-4d09-a465-b00de705d6a7
+
+{
+  "user_id": "user-id"
+}

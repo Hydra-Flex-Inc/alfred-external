@@ -1,0 +1,9 @@
+### Simple call
+POST http://localhost:7071/api/component
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
+
+{
+  "id": "52c5af99-bea5-419b-aa8c-74c4402cbdc9",
+  "name": "Pump 2"
+}

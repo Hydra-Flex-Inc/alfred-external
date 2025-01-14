@@ -17,8 +17,10 @@ app.http("user", {
       // Retrieve the authorized user.
       const authorizedUser = await Auth.authorizeUser(req, db);
 
+      const body = await req.json();
+
       // Validate input
-      const validator = new Validator(req.body, {
+      const validator = new Validator(body, {
         user_id: "required|uuid",
         role_type: "in:admin,member",
         name: "freeflow",
@@ -31,10 +33,10 @@ app.http("user", {
 
       // Do not allow the authorized user to remove their own admin privileges
       if (
-        authorizedUser.user_id === req.body.user_id && // updating self
+        authorizedUser.user_id === body.user_id && // updating self
         authorizedUser.role_type === "admin" && // self is an admin
-        req.body.role_type &&
-        req.body.role_type !== "admin" // Attempting update to a non-admin role.
+        body.role_type &&
+        body.role_type !== "admin" // Attempting update to a non-admin role.
       ) {
         const error = new Error(
           "You can’t remove the admin role from yourself."
@@ -47,7 +49,7 @@ app.http("user", {
       // TODO: `canAccessUser` is poorly named. It returns the whole user, not a bool.
       // Also seems a bit odd to pass in the `db` object.
       // It's probably bettter to actually get a bool and then keep the getUser obvious in the functions.
-      let user = await Auth.canAccessUser(req.body.user_id, authorizedUser, db);
+      let user = await Auth.canAccessUser(body.user_id, authorizedUser, db);
       console.log(JSON.stringify(user, null, 2));
 
       // Eliminate all potentially pre-existing users_to_locations for this user,
@@ -57,7 +59,7 @@ app.http("user", {
       ]);
 
       // Update user's role_type if exists
-      if (req.body.role_type) {
+      if (body.role_type) {
         await db.query(
           `UPDATE users_to_businesses
         SET role_type = $1
@@ -68,7 +70,7 @@ app.http("user", {
           user_id,
           business_id,
           role_type`,
-          [req.body.role_type, req.body.user_id, authorizedUser.business_id]
+          [body.role_type, body.user_id, authorizedUser.business_id]
         );
       }
 
@@ -107,11 +109,11 @@ app.http("user", {
       };
 
       // Add locations if this user is a "member" role_type and there are locations to add
-      if (user.role_type === "member" && req.body?.locs?.length > 0) {
-        const insertValuesString = req.body.locs
+      if (user.role_type === "member" && body?.locs?.length > 0) {
+        const insertValuesString = body.locs
           .map((d, i) => `($1,$${i + 2})`)
           .join(",");
-        const insertParams = [user.id, ...req.body.locs];
+        const insertParams = [user.id, ...body.locs];
         await db.query(
           `INSERT INTO users_to_locations (user_id, location_id) VALUES ${insertValuesString}`,
           insertParams
@@ -119,18 +121,18 @@ app.http("user", {
       }
 
       // Update user's name in Auth0 if exists and is different
-      if (req.body.name && req.body.name !== user.name) {
-        management.users.update({ id: user.auth0_id }, { name: req.body.name });
-        user.name = req.body.name;
+      if (body.name && body.name !== user.name) {
+        management.users.update({ id: user.auth0_id }, { name: body.name });
+        user.name = body.name;
       }
 
       // Update user's phone in Auth0 if exists and is different
-      if (req.body.phone && req.body.phone !== user.phone) {
+      if (body.phone && body.phone !== user.phone) {
         await management.users.update(
           { id: user.auth0_id },
-          { user_metadata: { phone_number: req.body.phone } }
+          { user_metadata: { phone_number: body.phone } }
         );
-        user.phone = req.body.phone;
+        user.phone = body.phone;
       }
 
       // Gather user's location IDs based on `role_type`

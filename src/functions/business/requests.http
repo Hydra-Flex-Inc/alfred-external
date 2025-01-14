@@ -1,0 +1,9 @@
+### Simple call
+POST http://localhost:7071/api/business
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
+
+{
+  "id": "0434d766-7f9c-4a29-82b6-88a1616bf7b5",
+  "name": "J's Amazing Carwash"
+}
