@@ -1,0 +1,8 @@
+POST http://localhost:7071/api/location
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
+
+{
+  "id": "df557bad-c51f-40a6-cb54-73aa3bdf6f98",
+  "display_name": "Justus Home"
+}

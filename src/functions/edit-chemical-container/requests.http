@@ -1,0 +1,44 @@
+## good dev request
+POST http://localhost:7071/api/edit-chemical-container
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+{
+    "containerId": "61273d76-be47-46e7-94de-0582d5d299df",
+    "chemicalName": "AF2010 1X",
+    "customName": "#10_aaaa",
+    "container": "30",
+    "valves": [
+        {
+            "panel": 2,
+            "valve": 2
+        }
+    ],
+    "code": null,
+    "gatewayId": "0123C489F5D9F652EE",
+    "container_cost": 123.45,
+    "currency_code": "USD"
+}
+
+### good prod request
+
+POST https://alfred-api.hydraflexinc.com/alfred/edit-chemical-container
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+{
+    "containerId": "61273d76-be47-46e7-94de-0582d5d299df",
+    "chemicalName": "AF2010 1X",
+    "customName": "#10_aaa",
+    "container": "30",
+    "valves": [
+        {
+            "panel": 3,
+            "valve": 3
+        }
+    ],
+    "code": null,
+    "gatewayId": "0123C489F5D9F652EE",
+    "container_cost": 123.45,
+    "currency_code": "USD"
+}

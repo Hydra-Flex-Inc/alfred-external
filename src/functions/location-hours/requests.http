@@ -1,0 +1,99 @@
+### SUCCESS: Valid Hours Body
+
+POST http://localhost:7071/api/location-hours
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
+
+{
+  "location_id": "df557bad-c51f-40a6-cb54-73aa3bdf6f98",
+  "hours": [
+    { "day": 1, "open": "08:00", "close": "20:00" },
+    { "day": 2, "open": "08:00", "close": "20:00" },
+    { "day": 3, "open": "08:00", "close": "20:00", "closed": true },
+    { "day": 4, "open": "08:00", "close": "20:00" },
+    { "day": 5, "closed": true },
+    { "day": 6, "open": "09:00", "close": "18:00" },
+    { "day": 7, "open": "10:00", "close": "16:00" }
+  ]
+}
+
+### FAIL: Incorrect Day Range 
+POST http://localhost:7071/api/location-hours
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+{
+  "location_id": "434648dc-256b-446a-8992-d2c1ead0af2e",
+  "hours": [
+    { "day": 8, "open": "08:00", "close": "20:00" }
+  ]
+}
+
+### FAIL: Incorrect Time Format HH:MM
+POST http://localhost:7071/api/location-hours
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+{
+  "location_id": "434648dc-256b-446a-8992-d2c1ead0af2e",
+  "hours": [
+    { "day": 1, "open": "8:00", "close": "20:00" },
+    { "day": 2, "open": "8:00", "close": "20:00" },
+    { "day": 3, "open": "8:00", "close": "20:00" },
+    { "day": 4, "open": "8:00", "close": "20:00" },
+    { "day": 5, "open": "8:00", "close": "20:00" },
+    { "day": 6, "open": "9:00", "close": "18:00" },
+    { "day": 7, "open": "10:00", "close": "09:00" }
+  ]
+}
+
+
+### FAIL: Open Time After Close Time
+POST http://localhost:7071/api/location-hours
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+{
+  "location_id": "434648dc-256b-446a-8992-d2c1ead0af2e",
+  "hours": [
+    { "day": 1, "open": "08:00", "close": "20:00" },
+    { "day": 2, "open": "08:00", "close": "20:00" },
+    { "day": 3, "open": "08:00", "close": "20:00" },
+    { "day": 4, "open": "08:00", "close": "20:00" },
+    { "day": 5, "open": "08:00", "close": "20:00" },
+    { "day": 6, "open": "09:00", "close": "18:00" },
+    { "day": 7, "open": "10:00", "close": "09:00" }
+  ]
+}
+
+### FAIL: Missing Days (not all 7 days provided):
+POST http://localhost:7071/api/location-hours
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+{
+  "location_id": "434648dc-256b-446a-8992-d2c1ead0af2e",
+  "hours": [
+    { "day": 1, "open": "08:00", "close": "20:00" },
+    { "day": 2, "open": "08:00", "close": "20:00" },
+    { "day": 3, "open": "08:00", "close": "20:00" }
+  ]
+}
+
+### FAIL: Impossible time
+POST http://localhost:7071/api/location-hours
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+
+{
+  "location_id": "434648dc-256b-446a-8992-d2c1ead0af2e",
+  "hours": [
+    { "day": 1, "open": "08:00", "close": "31:00" },
+    { "day": 2, "open": "08:00", "close": "20:00" },
+    { "day": 3, "open": "08:00", "close": "20:00" },
+    { "day": 4, "open": "08:00", "close": "20:00" },
+    { "day": 5, "open": "08:00", "close": "20:00" },
+    { "day": 6, "open": "09:00", "close": "18:00" },
+    { "day": 7, "open": "10:00", "close": "09:00" }
+  ]
+}
