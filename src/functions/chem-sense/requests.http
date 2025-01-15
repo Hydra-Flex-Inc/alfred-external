@@ -1,4 +1,4 @@
-###
+### Auth version
 
 GET http://localhost:7071/api/chem-sense
     ?gatewayId=advm2-sensor-trial
@@ -6,16 +6,6 @@ GET http://localhost:7071/api/chem-sense
     &end=2024-11-29T00:00:00.000Z
 content-type: application/json
 Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
-
-###
-
-GET http://localhost:7071/api/chem-sense-data
-    ?gatewayId=advm2-sensor-trial
-    &start=2024-11-19T00:00:00.000Z
-    &end=2024-11-29T00:00:00.000Z
-content-type: application/json
-Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
-
 
 ###
 
@@ -37,4 +27,11 @@ Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
     "start": "2024-11-14T05:00:00.000Z"
 }
 
+### No auth version
 
+GET http://localhost:7071/api/chem-sense-data
+    ?gatewayId=advm2-sensor-trial
+    &start=2024-11-19T00:00:00.000Z
+    &end=2024-11-29T00:00:00.000Z
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
