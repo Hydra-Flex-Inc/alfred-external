@@ -33,7 +33,7 @@ const getLocationNameData = async (req, context) => {
       carWashName += ` (${req.query.gatewayId})`;
     }
     return {
-      body: JSON.stringify(carWashName),
+      body: carWashName,
       headers: {
         "Content-Type": "application/json",
       },
@@ -93,6 +93,7 @@ app.http("location-name-data", {
       }
 
       const carWashName = await getLocationNameData(req, context);
+
       return {
         body: JSON.stringify(carWashName),
         headers: {
