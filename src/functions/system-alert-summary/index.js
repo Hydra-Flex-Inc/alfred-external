@@ -142,9 +142,7 @@ app.http("system-alert-summary", {
         },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

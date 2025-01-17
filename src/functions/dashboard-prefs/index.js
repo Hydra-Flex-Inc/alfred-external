@@ -27,10 +27,7 @@ app.http("dashboard-prefs", {
         }
       }
     } catch (error) {
-      // Handle errors
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });
@@ -145,7 +142,7 @@ async function setDashboardPrefs(req, context) {
     const error = new Error(
       "Either desktop_json or mobile_json is required and must be a valid JSON object."
     );
-    error.code = "HTTP_400";
+    error.status = 400;
     throw error;
   }
 }

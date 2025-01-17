@@ -202,10 +202,7 @@ app.http("flow-sense-gpm", {
         },
       };
     } catch (error) {
-      // Handle errors
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

@@ -44,14 +44,12 @@ app.http("profile-picture", {
 
         default: {
           const error = new Error("Method does not exist");
-          error.code = "HTTP_404";
+          error.status = 404;
           throw error;
         }
       }
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

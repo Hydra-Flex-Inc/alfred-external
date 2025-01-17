@@ -284,7 +284,7 @@ app.http("wash-package", {
           // This should not happen as Azure APIM protects against this, but as a failsafe
           // eslint-disable-next-line no-case-declarations
           const error = new Error("Method does not exist");
-          error.code = "HTTP_404";
+          error.status = 404;
           throw error;
       }
 
@@ -295,9 +295,7 @@ app.http("wash-package", {
         },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

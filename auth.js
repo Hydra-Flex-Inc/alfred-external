@@ -25,7 +25,7 @@ module.exports = {
     if (validator.fails()) {
       // The Auth Token cookie was not present, or was not a UUID.
       const error = new Error("Unauthorized");
-      error.code = "HTTP_401";
+      error.status = 401;
       throw error;
     }
 
@@ -56,14 +56,14 @@ module.exports = {
     } else {
       // Couldn't find a user with this Auth code.
       const error = new Error("Unauthorized");
-      error.code = "HTTP_401";
+      error.status = 401;
       throw error;
     }
 
     // If business ID is required, but not present on authorized user, throw a 403
     if (options.requireBusinessId && !authorizedUser.business_id) {
       const error = new Error("Forbidden");
-      error.code = "HTTP_403";
+      error.status = 403;
       throw error;
     }
 
@@ -75,7 +75,7 @@ module.exports = {
       authorizedUser.role_type !== "admin"
     ) {
       const error = new Error("Forbidden");
-      error.code = "HTTP_403";
+      error.status = 403;
       throw error;
     }
 
@@ -105,7 +105,7 @@ module.exports = {
 
     if (result.rowCount === 0) {
       const error = new Error("Forbidden");
-      error.code = "HTTP_403";
+      error.status = 403;
       throw error;
     } else {
       return result.rows.shift().business_id;
@@ -140,7 +140,7 @@ module.exports = {
 
     if (result.rowCount === 0) {
       const error = new Error("Forbidden");
-      error.code = "HTTP_403";
+      error.status = 403;
       throw error;
     } else {
       return result.rows.shift().location_id;
@@ -179,7 +179,7 @@ module.exports = {
 
     if (result.rowCount === 0) {
       const error = new Error("Forbidden");
-      error.code = "HTTP_403";
+      error.status = 403;
       throw error;
     } else {
       return result.rows.shift().iot_hub_device_id;
@@ -204,7 +204,7 @@ module.exports = {
       authorizedUser.user_id !== userId
     ) {
       const error = new Error("Forbidden");
-      error.code = "HTTP_403";
+      error.status = 403;
       throw error;
     }
 
@@ -226,7 +226,7 @@ module.exports = {
 
     if (result.rowCount === 0) {
       const error = new Error("Forbidden");
-      error.code = "HTTP_403";
+      error.status = 403;
       throw error;
     } else {
       return result.rows.shift();
@@ -249,7 +249,7 @@ module.exports = {
       authorizedUser.business_id !== businessId
     ) {
       const error = new Error("Forbidden");
-      error.code = "HTTP_403";
+      error.status = 403;
       throw error;
     }
 

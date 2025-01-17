@@ -27,7 +27,7 @@ app.http("user-remove", {
       // Do not allow the authorized user to remove themself.
       if (authorizedUser.user_id === body.user_id) {
         const error = new Error("The logged in user cannot remove themself.");
-        error.code = "HTTP_400";
+        error.status = 400;
         throw error;
       }
 
@@ -60,9 +60,7 @@ app.http("user-remove", {
         },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

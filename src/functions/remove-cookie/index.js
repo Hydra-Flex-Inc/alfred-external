@@ -22,7 +22,7 @@ app.http("remove-cookie", {
       if (validator.fails()) {
         // The Auth Token cookie was not present
         const error = new Error("Unauthorized");
-        error.code = "HTTP_401";
+        error.status = 401;
         throw error;
       }
 
@@ -60,9 +60,7 @@ app.http("remove-cookie", {
         },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

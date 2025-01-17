@@ -52,7 +52,7 @@ async function getAlfredUser(auth0_id) {
     const error = new Error(
       "The number of users with this auth0_id is greater than 1"
     );
-    error.code = "HTTP_403";
+    error.status = 403;
     throw error;
   }
 
@@ -183,7 +183,7 @@ app.http("user-invite", {
           const error = new Error(
             "Inserting this user into the Alfred system failed"
           );
-          error.code = "HTTP_403";
+          error.status = 403;
           throw error;
         }
 
@@ -213,7 +213,7 @@ app.http("user-invite", {
         if (processedSubjectUser.business_id !== authorizedUser.business_id) {
           // not the right one?
           const error = new Error("This user already belongs to a business.");
-          error.code = "HTTP_403";
+          error.status = 403;
           throw error;
         }
       } else {
@@ -336,9 +336,7 @@ app.http("user-invite", {
         },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

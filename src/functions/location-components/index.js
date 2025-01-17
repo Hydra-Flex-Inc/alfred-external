@@ -57,7 +57,7 @@ app.http("location-components", {
       const result = await db.query(query, params);
       if (result.rowCount === 0) {
         const error = new Error("No components found.");
-        error.code = "HTTP_404";
+        error.status = 404;
         throw error;
       }
 
@@ -85,9 +85,7 @@ app.http("location-components", {
         },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

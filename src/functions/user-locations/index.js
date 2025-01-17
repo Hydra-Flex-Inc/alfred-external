@@ -43,7 +43,7 @@ app.http("user-locations", {
 
       if (lookupUserQuery.rowCount === 0) {
         const error = new Error("User not found");
-        error.code = "HTTP_404";
+        error.status = 404;
         throw error;
       }
       const alfredUserData = lookupUserQuery.rows[0];
@@ -162,9 +162,7 @@ app.http("user-locations", {
         },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

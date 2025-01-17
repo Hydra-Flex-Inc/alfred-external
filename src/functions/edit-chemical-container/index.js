@@ -76,10 +76,7 @@ app.http("edit-chemical-container", {
         },
       };
     } catch (error) {
-      // Handle errors
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

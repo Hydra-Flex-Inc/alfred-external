@@ -156,10 +156,7 @@ const getFlowSenseData = async (req, context) => {
       },
     };
   } catch (error) {
-    // Handle errors
-    return {
-      body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-    };
+    return ErrorHandler.prepareResponse(context, error);
   }
 };
 
@@ -186,10 +183,7 @@ app.http("flow-sense-total-data", {
       const flowSenseData = await getFlowSenseData(req, context);
       return { ...flowSenseData };
     } catch (error) {
-      // Handle errors
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });
@@ -224,10 +218,7 @@ app.http("flow-sense-total", {
       const flowSenseData = await getFlowSenseData(req, context);
       return { ...flowSenseData };
     } catch (error) {
-      // Handle errors
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

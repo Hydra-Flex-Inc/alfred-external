@@ -51,7 +51,7 @@ app.http("sensor-data", {
         const error = new Error(
           "No valid sensors found for the given gateway."
         );
-        error.code = "HTTP_400";
+        error.status = 400;
         throw error;
       }
       const sortedSensors = [];
@@ -116,10 +116,7 @@ app.http("sensor-data", {
         },
       };
     } catch (error) {
-      // Handle errors
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

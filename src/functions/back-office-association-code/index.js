@@ -39,14 +39,14 @@ app.http("back-office-association-code", {
 
       if (locationResult.rowCount !== 1) {
         const error = new Error("Invalid location_id");
-        error.code = "HTTP_400";
+        error.status = 400;
         throw error;
       }
       const location = locationResult.rows[0];
 
       if (location.business_id === null) {
         const error = new Error("Location is not associated with a business.");
-        error.code = "HTTP_400";
+        error.status = 400;
         throw error;
       } else {
         business_id = location.business_id;
@@ -92,7 +92,7 @@ app.http("back-office-association-code", {
 
         if (insertResult.rowCount !== 1) {
           const error = new Error("Failed to create a new association code");
-          error.code = "HTTP_500";
+          error.status = 500;
           throw error;
         }
 
@@ -107,10 +107,7 @@ app.http("back-office-association-code", {
         },
       };
     } catch (error) {
-      // Handle errors using a centralized error handler.
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

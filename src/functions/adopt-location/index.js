@@ -33,7 +33,7 @@ app.http("adopt-location", {
           const error = new Error(
             "Business name required for users without a business."
           );
-          error.code = "HTTP_400";
+          error.status = 400;
           throw error;
         }
       }
@@ -75,7 +75,7 @@ app.http("adopt-location", {
         const error = new Error(
           "Sorry, this doesn't seem to be a valid adoption code."
         );
-        error.code = "HTTP_400";
+        error.status = 400;
         throw error;
       }
 
@@ -85,20 +85,20 @@ app.http("adopt-location", {
         const error = new Error(
           "Sorry, this adoption code has already been used."
         );
-        error.code = "HTTP_400";
+        error.status = 400;
         throw error;
       } else if (
         location.code_valid_thru &&
         location.code_valid_thru * 1000 < Date.now()
       ) {
         const error = new Error("Sorry, this adoption code has expired.");
-        error.code = "HTTP_400";
+        error.status = 400;
         throw error;
       } else if (location.business_id) {
         const error = new Error(
           "Sorry, this location has already been adopted."
         );
-        error.code = "HTTP_400";
+        error.status = 400;
         throw error;
       }
 
@@ -190,9 +190,7 @@ app.http("adopt-location", {
         },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

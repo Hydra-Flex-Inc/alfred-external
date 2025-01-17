@@ -41,7 +41,7 @@ app.http("user", {
         const error = new Error(
           "You can’t remove the admin role from yourself."
         );
-        error.code = "HTTP_400";
+        error.status = 400;
         throw error;
       }
 
@@ -186,7 +186,7 @@ app.http("user", {
         }
         default: {
           const error = new Error("Unrecognized `role_type`");
-          error.code = "HTTP_404";
+          error.status = 404;
           throw error;
         }
       }
@@ -200,9 +200,7 @@ app.http("user", {
         },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

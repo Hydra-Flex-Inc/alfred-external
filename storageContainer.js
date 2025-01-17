@@ -8,7 +8,7 @@ module.exports = {
       const error = new Error(
         "Invalid file type. Only JPEG and PNG files are allowed."
       );
-      error.code = "HTTP_415";
+      error.status = 415;
       throw error;
     }
 

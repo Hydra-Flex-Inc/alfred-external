@@ -35,7 +35,7 @@ app.http("back-office-wash-package-sales", {
       if (start >= end) {
         // string compare is fine for this
         const error = new Error("The start date must be before the end date.");
-        error.code = "HTTP_400";
+        error.status = 400;
         throw error;
       }
 
@@ -64,7 +64,7 @@ app.http("back-office-wash-package-sales", {
       }
       if (difference_in_ms > allowed_difference_in_ms) {
         const error = new Error("Requested date range is too large");
-        error.code = "HTTP_400";
+        error.status = 400;
         throw error;
       }
 
@@ -80,14 +80,14 @@ app.http("back-office-wash-package-sales", {
       // context.log('Business query:', businessQuery.rows);
       if (businessQuery.rowCount === 0) {
         const error = new Error("Business not found");
-        error.code = "HTTP_404";
+        error.status = 404;
         throw error;
       }
       if (!businessQuery.rows[0].back_office_client_id) {
         const error = new Error(
           "Business has not been connected to a Back Office account. Contact Sonny's Support to resolve this."
         );
-        error.code = "HTTP_404";
+        error.status = 404;
         throw error;
       }
       const clientId = businessQuery.rows[0].back_office_client_id;
@@ -103,14 +103,14 @@ app.http("back-office-wash-package-sales", {
       // context.log('Location query:', locationQuery.rows);
       if (locationQuery.rowCount === 0) {
         const error = new Error("Location not found");
-        error.code = "HTTP_404";
+        error.status = 404;
         throw error;
       }
       if (!locationQuery.rows[0].back_office_site_id) {
         const error = new Error(
           "Location has not been connected to a Back Office account. Contact Sonny's Support to resolve this."
         );
-        error.code = "HTTP_404";
+        error.status = 404;
         throw error;
       }
       const siteId = locationQuery.rows[0].back_office_site_id;
@@ -142,7 +142,7 @@ app.http("back-office-wash-package-sales", {
             const error = new Error(
               e.response.statusText || e.response.data.message
             );
-            error.code = `HTTP_${e.response.status}`;
+            error.status = e.response.status;
             throw error;
           }
         });
@@ -190,9 +190,7 @@ app.http("back-office-wash-package-sales", {
         },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

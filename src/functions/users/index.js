@@ -47,7 +47,7 @@ app.http("users", {
 
       if (userQuery.rowCount === 0) {
         const error = new Error("No users found.");
-        error.code = "HTTP_404";
+        error.status = 404;
         throw error;
       }
 
@@ -80,7 +80,7 @@ app.http("users", {
         })
         .catch((error) => {
           const errorRes = new Error("Auth0 User Fetch Issue", error);
-          errorRes.code = "HTTP_500";
+          errorRes.status = 500;
           throw errorRes;
         });
 
@@ -142,7 +142,7 @@ app.http("users", {
           }
           default: {
             const error = new Error("Unrecognized `role_type`");
-            error.code = "HTTP_404";
+            error.status = 404;
             throw error;
           }
         }
@@ -183,9 +183,7 @@ app.http("users", {
         headers: { "Content-Type": "application/json" },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

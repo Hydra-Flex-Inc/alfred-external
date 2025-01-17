@@ -45,7 +45,7 @@ app.http("user-update-notification", {
       // this should have affected exactly one row
       if (queryResults.rowCount !== 1) {
         const error = new Error("UPDATE query unsuccessful");
-        error.code = "HTTP_500";
+        error.status = 500;
         throw error;
       }
 
@@ -55,9 +55,7 @@ app.http("user-update-notification", {
         headers: { "Content-Type": "application/json" },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

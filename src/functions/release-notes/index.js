@@ -39,7 +39,7 @@ const getReleaseNotes = async (authorizedUser) => {
 const createReleaseNotes = async (req) => {
   // Return a not implemented
   const error = new Error("Not Implemented");
-  error.code = "HTTP_501";
+  error.status = 501;
   throw error;
 };
 
@@ -62,7 +62,7 @@ app.http("release-notes", {
       } else {
         // This should not happen as Azure APIM protects against this, but as a failsafe
         const error = new Error("Method does not exist");
-        error.code = "HTTP_404";
+        error.status = 404;
         throw error;
       }
 
@@ -73,9 +73,7 @@ app.http("release-notes", {
         },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

@@ -39,9 +39,7 @@ const getLocationNameData = async (req, context) => {
       },
     };
   } catch (error) {
-    return {
-      body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-    };
+    return ErrorHandler.prepareResponse(context, error);
   }
 };
 
@@ -71,9 +69,7 @@ app.http("location-name", {
         },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });
@@ -101,9 +97,7 @@ app.http("location-name-data", {
         },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

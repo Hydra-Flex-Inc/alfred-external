@@ -23,21 +23,12 @@ module.exports = {
     } else if (error instanceof Error) {
       context.error(error.stack);
 
-      const code = error?.code || null;
-      if (code?.startsWith("HTTP_")) {
-        // is a string which starts with HTTP_
-        out.status = +code.split("_").pop();
-        out.body.error = error.message;
-      } else if (Number.isFinite(+code) && +code >= 400 && +code <= 599) {
-        out.status = +code;
-        out.body.error = error.message;
-      }
-      // by default, leave the 500 and grab the error message
+      out.status = error?.status || null;
       out.body.error = error.message;
     } else {
       out.body.error = error; // assume this is a simple string
     }
-
+    out.body = JSON.stringify(out.body);
     context.log("out", out);
 
     return out;

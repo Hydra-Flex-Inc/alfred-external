@@ -52,7 +52,7 @@ app.http("valve-maintenance", {
         const error = new Error(
           "This maintenance event does not exist, was deleted, or replaced by an updated maintenance event."
         );
-        error.code = "HTTP_400";
+        error.status = 400;
         throw error;
       } else {
         // it is one event, as expected
@@ -87,7 +87,7 @@ app.http("valve-maintenance", {
               const error = new Error(
                 "Unable to find current cycle count for this maintenance event"
               );
-              error.code = "HTTP_500";
+              error.status = 500;
               throw error;
             }
             const currentCyclesOnValve = currentCycles.rows[0].completed_cycles;
@@ -121,7 +121,7 @@ app.http("valve-maintenance", {
 
           default: {
             const error = new Error("Unknown event_type");
-            error.code = "HTTP_400";
+            error.status = 400;
             throw error;
           }
         }
@@ -131,9 +131,7 @@ app.http("valve-maintenance", {
         headers: { "Content-Type": "application/json" },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

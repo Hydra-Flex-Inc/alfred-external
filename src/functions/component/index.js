@@ -48,7 +48,7 @@ app.http("component", {
 
       if (result.rowCount > 0) {
         const error = new Error("Each component must have a unique name.");
-        error.code = "HTTP_400";
+        error.status = 400;
         throw error;
       }
 
@@ -74,9 +74,7 @@ app.http("component", {
         },
       };
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });

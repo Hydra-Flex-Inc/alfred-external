@@ -12,7 +12,7 @@ const processHours = (hours, context) => {
     const error = new Error(
       "Invalid hours array. Must be an array of 7 objects, one for each day of the week (1-7)."
     );
-    error.code = "HTTP_400";
+    error.status = 400;
     throw error;
   }
 
@@ -31,7 +31,7 @@ const processHours = (hours, context) => {
 
     if (!day) {
       const error = new Error(`Invalid hours array: Missing day ${i}.`);
-      error.code = "HTTP_400";
+      error.status = 400;
       throw error;
     } else {
       // we have _something_ for this day... let's check it out
@@ -48,14 +48,14 @@ const processHours = (hours, context) => {
           const error = new Error(
             `Location not closed on day ${i}: Invalid time format for day ${i}. Required format is HH:MM.`
           );
-          error.code = "HTTP_400";
+          error.status = 400;
           throw error;
         }
         if (day.open >= day.close) {
           const error = new Error(
             `Location not closed on day ${i}: Open time must be before close time for day ${i}.`
           );
-          error.code = "HTTP_400";
+          error.status = 400;
           throw error;
         }
       } else {
@@ -120,7 +120,7 @@ app.http("location-hours", {
 
         if (hoursQuery.rowCount !== 1) {
           const error = new Error("UPDATE query unsuccessful");
-          error.code = "HTTP_500";
+          error.status = 500;
           throw error;
         }
 
@@ -131,9 +131,7 @@ app.http("location-hours", {
         };
       }
     } catch (error) {
-      return {
-        body: JSON.stringify(ErrorHandler.prepareResponse(context, error)),
-      };
+      return ErrorHandler.prepareResponse(context, error);
     }
   },
 });
