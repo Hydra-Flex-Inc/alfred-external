@@ -1,0 +1,32 @@
+name: Merge Staging to Master and Master to Develop
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - master
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if the source branch is 'staging'
+        if: ${{ github.event.pull_request.head.ref == 'staging' }}
+        run: echo "Detected a pull request merging 'staging' into 'master'."
+
+      - name: Merge master -> develop
+        if: ${{ github.event.pull_request.head.ref == 'staging' }}
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          from_branch: master
+          target_branch: develop
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Exit if not staging
+        if: ${{ github.event.pull_request.head.ref != 'staging' }}
+        run: |
+          echo "This is not a pull request from 'staging'. Exiting..."
