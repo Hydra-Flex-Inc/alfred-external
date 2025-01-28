@@ -5,6 +5,8 @@ const Validator = require("../../../validator");
 const ErrorHandler = require("../../../errorHandler");
 const jsonwebtoken = require("jsonwebtoken");
 
+// No auth on this so no need to reconfigure
+
 // we may want to move this to an env var or a file to be read, though the latter would mean
 // that we'd need to go async to account for the file read
 const cert = `-----BEGIN CERTIFICATE-----

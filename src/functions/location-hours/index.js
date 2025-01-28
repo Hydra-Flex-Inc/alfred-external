@@ -73,6 +73,37 @@ const processHours = (hours, context) => {
   return out;
 };
 
+const executeFunctionLogic = async (body, context) => {
+  try {
+    // Validate the hours array
+    const processedHours = processHours(body.hours, context);
+
+    if (processedHours.length === 7) {
+      // shouldn't need this if since processHours throws an error if it fails
+
+      const hoursQuery = await db.query(
+        `
+      UPDATE locations
+      SET hours = $1
+      WHERE locations.id = $2
+      `,
+        [JSON.stringify(processedHours), body.location_id]
+      );
+
+      if (hoursQuery.rowCount !== 1) {
+        const error = new Error("UPDATE query unsuccessful");
+        error.status = 500;
+        throw error;
+      }
+
+      // Success response
+      return processedHours;
+    }
+  } catch (error) {
+    return ErrorHandler.prepareResponse(context, error);
+  }
+};
+
 app.http("location-hours", {
   methods: ["POST"],
   handler: async (req, context) => {
@@ -103,33 +134,44 @@ app.http("location-hours", {
       // Ensure that the authorized user is allowed to update this particular location
       await Auth.canAccessLocation(body.location_id, authorizedUser, db);
 
-      // Validate the hours array
-      const processedHours = processHours(body.hours, context);
+      const out = await executeFunctionLogic(body, context);
+      return {
+        body: JSON.stringify(out),
+        headers: { "Content-Type": "application/json" },
+      };
+    } catch (error) {
+      return ErrorHandler.prepareResponse(context, error);
+    }
+  },
+});
 
-      if (processedHours.length === 7) {
-        // shouldn't need this if since processHours throws an error if it fails
+app.http("location-hours-data", {
+  methods: ["POST"],
+  handler: async (req, context) => {
+    try {
+      req = Common.parseRequest(req);
 
-        const hoursQuery = await db.query(
-          `
-        UPDATE locations
-        SET hours = $1
-        WHERE locations.id = $2
-      `,
-          [JSON.stringify(processedHours), body.location_id]
-        );
+      const body = await req.json();
 
-        if (hoursQuery.rowCount !== 1) {
-          const error = new Error("UPDATE query unsuccessful");
-          error.status = 500;
-          throw error;
-        }
+      // Validation schema for the incoming request
+      const validator = new Validator(body, {
+        location_id: "required|uuid",
+        hours: "required|array",
+        "hours.*.day": "required|integer|between:1,7",
+        "hours.*.open": "string",
+        "hours.*.close": "string",
+        "hours.*.closed": "boolean",
+      });
 
-        // Success response
-        return {
-          body: JSON.stringify(processedHours),
-          headers: { "Content-Type": "application/json" },
-        };
+      if (validator.fails()) {
+        throw validator.errors;
       }
+
+      const out = await executeFunctionLogic(body, context);
+      return {
+        body: JSON.stringify(out),
+        headers: { "Content-Type": "application/json" },
+      };
     } catch (error) {
       return ErrorHandler.prepareResponse(context, error);
     }

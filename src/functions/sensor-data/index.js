@@ -4,6 +4,8 @@ const db = require("../../../db");
 const Validator = require("../../../validator");
 const ErrorHandler = require("../../../errorHandler");
 
+// No auth on this so no need to reconfigure
+
 app.http("sensor-data", {
   methods: ["GET"],
   handler: async (req, context) => {

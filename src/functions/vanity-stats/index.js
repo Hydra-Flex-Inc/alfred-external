@@ -3,6 +3,8 @@ const Common = require("../../../common");
 const db = require("../../../db");
 const ErrorHandler = require("../../../errorHandler");
 
+// Does not use auth
+
 app.http("vanity-stats", {
   methods: ["GET"],
   handler: async (req, context) => {

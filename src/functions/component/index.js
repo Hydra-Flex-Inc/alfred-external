@@ -5,6 +5,8 @@ const Validator = require("../../../validator");
 const Auth = require("../../../auth");
 const ErrorHandler = require("../../../errorHandler");
 
+// Requires the authorized user in order to authorize access to component.
+
 app.http("component", {
   methods: ["POST"],
   handler: async (req, context) => {

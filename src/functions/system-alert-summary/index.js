@@ -5,6 +5,8 @@ const Validator = require("../../../validator");
 const Auth = require("../../../auth");
 const ErrorHandler = require("../../../errorHandler");
 
+// Uses user_id and business_id
+
 app.http("system-alert-summary", {
   methods: ["GET"],
   handler: async (req, context) => {

@@ -5,6 +5,8 @@ const Validator = require("../../../validator");
 const Auth = require("../../../auth");
 const ErrorHandler = require("../../../errorHandler");
 
+// Updates the users table
+
 app.http("user-update-notification", {
   methods: ["GET"],
   handler: async (req, context) => {

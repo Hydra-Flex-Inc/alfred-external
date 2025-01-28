@@ -5,6 +5,8 @@ const Auth = require("../../../auth");
 const ErrorHandler = require("../../../errorHandler");
 const Common = require("../../../common");
 
+// Requires business id
+
 app.http("location-components", {
   methods: ["GET"],
   handler: async (req, context) => {

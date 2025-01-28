@@ -10,6 +10,8 @@ const config = require("../../../config");
 config.auth0.scope = "read:users create:user_tickets"; // add the roles we want to use in this context
 const management = new ManagementClient(config.auth0);
 
+// Uses auth0_id to get user info from Auth0
+
 /// ///////////////////
 // Begin function call
 /// ///////////////////

@@ -5,6 +5,8 @@ const ErrorHandler = require("../../../errorHandler");
 const Auth = require("../../../auth");
 const Common = require("../../../common");
 
+// Uses user_id and business_id
+
 app.http("maintenance-events", {
   methods: ["GET"],
   handler: async (req, context) => {

@@ -4,6 +4,8 @@ const Validator = require("../../../validator");
 const cookie = require("cookie");
 const ErrorHandler = require("../../../errorHandler");
 
+// No auth on this so no need to reconfigure
+
 app.http("remove-cookie", {
   methods: ["GET"],
   handler: async (req, context) => {

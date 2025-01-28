@@ -7,6 +7,9 @@ const Validator = require("../../../validator");
 const ErrorHandler = require("../../../errorHandler");
 const Common = require("../../../common");
 
+// Uses the authorized user business id to query businesses.
+// Will we be keeping track of wash packages?
+
 app.http("back-office-wash-package-sales", {
   methods: ["GET"],
   handler: async (req, context) => {
