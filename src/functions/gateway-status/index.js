@@ -8,31 +8,35 @@ const Common = require("../../../common");
 const executeFunctionLogic = async (req, context) => {
   try {
     // prepare params
-    const params = [req.query.deviceId];
+    const params = [req.req_query.deviceId];
     const predicates = [`gs.device_id = $1`];
 
     // Handling 'start' and 'end' parameters with preference to 'start' and converting ISO8601 to unix timestamp
-    if (req.query.start) {
-      const startTime = Math.floor(new Date(req.query.start).getTime() / 1000);
+    if (req.req_query.start) {
+      const startTime = Math.floor(
+        new Date(req.req_query.start).getTime() / 1000
+      );
       predicates.push(`gs.unixtime >= $${params.length + 1}`);
       params.push(startTime);
-    } else if (req.query.since && Number.isFinite(+req.query.since)) {
+    } else if (req.req_query.since && Number.isFinite(+req.req_query.since)) {
       predicates.push(`gs.unixtime >= $${params.length + 1}`);
-      params.push(+req.query.since);
+      params.push(+req.req_query.since);
     }
 
-    if (req.query.end) {
-      const endTime = Math.floor(new Date(req.query.end).getTime() / 1000);
+    if (req.req_query.end) {
+      const endTime = Math.floor(new Date(req.req_query.end).getTime() / 1000);
       predicates.push(`gs.unixtime <= $${params.length + 1}`);
       params.push(endTime);
     }
 
     // This query can return a massive amount of rows. Set a reasonable limit as a default.
-    const limit = Number.isFinite(+req.query?.count) ? +req.query.count : 10000; // default to 10000
+    const limit = Number.isFinite(+req.req_query?.count)
+      ? +req.req_query.count
+      : 10000; // default to 10000
     params.push(limit);
 
-    const bucketMinutes = Number.isFinite(+req.query?.bucketMinutes)
-      ? +req.query.bucketMinutes
+    const bucketMinutes = Number.isFinite(+req.req_query?.bucketMinutes)
+      ? +req.req_query.bucketMinutes
       : null;
 
     let query;
@@ -100,7 +104,7 @@ app.http("gateway-status", {
       });
 
       // Validate input.
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         deviceId: "required|alpha_dash",
         since: "integer",
         count: "integer",
@@ -114,7 +118,7 @@ app.http("gateway-status", {
       }
 
       // Ensure that the authorized user is allowed to see this particular device ID.
-      await Auth.canAccessDevice(req.query.deviceId, authorizedUser, db);
+      await Auth.canAccessDevice(req.req_query.deviceId, authorizedUser, db);
 
       const out = await executeFunctionLogic(req, context);
 
@@ -137,7 +141,7 @@ app.http("gateway-status-data", {
       req = Common.parseRequest(req);
 
       // Validate input.
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         deviceId: "required|alpha_dash",
         since: "integer",
         count: "integer",

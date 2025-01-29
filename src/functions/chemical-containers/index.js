@@ -42,7 +42,9 @@ const executeFunctionLogic = async (req, context) => {
       cc.name ASC
     `;
 
-    const chemical_containers = await db.query(query, [req.query.gatewayId]);
+    const chemical_containers = await db.query(query, [
+      req.req_query.gatewayId,
+    ]);
     const out = chemical_containers.rows;
 
     // I think the sql isn't quite right. We get duplicates of some joined items
@@ -69,7 +71,7 @@ app.http("chemical-containers", {
         requireBusinessId: true,
       });
 
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         gatewayId: "required|alpha_dash",
       });
 
@@ -78,7 +80,7 @@ app.http("chemical-containers", {
       }
 
       // Ensure that the authorized user is allowed to see this particular device ID.
-      await Auth.canAccessDevice(req.query.gatewayId, authorizedUser, db);
+      await Auth.canAccessDevice(req.req_query.gatewayId, authorizedUser, db);
 
       const out = await executeFunctionLogic(req, context);
 
@@ -100,7 +102,7 @@ app.http("chemical-containers-data", {
     try {
       req = Common.parseRequest(req);
 
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         gatewayId: "required|alpha_dash",
       });
 

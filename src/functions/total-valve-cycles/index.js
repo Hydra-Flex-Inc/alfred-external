@@ -8,7 +8,7 @@ const ErrorHandler = require("../../../errorHandler");
 const executeFunctionLogic = async (req, context) => {
   try {
     // prepare params
-    const params = [req.query.deviceId];
+    const params = [req.req_query.deviceId];
     const predicates = [`vns.device_id = $1`];
 
     const query = `
@@ -79,7 +79,7 @@ app.http("total-valve-cycles", {
       });
 
       // Validate input.
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         deviceId: "required|alpha_dash",
       });
 
@@ -88,7 +88,7 @@ app.http("total-valve-cycles", {
       }
 
       // Ensure that the authorized user is allowed to see this particular device ID.
-      await Auth.canAccessDevice(req.query.deviceId, authorizedUser, db);
+      await Auth.canAccessDevice(req.req_query.deviceId, authorizedUser, db);
       const out = await executeFunctionLogic(req, context);
       return {
         body: JSON.stringify(out),
@@ -109,7 +109,7 @@ app.http("total-valve-cycles-data", {
       req = Common.parseRequest(req);
 
       // Validate input.
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         deviceId: "required|alpha_dash",
       });
 

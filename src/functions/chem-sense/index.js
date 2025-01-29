@@ -130,9 +130,9 @@ const getChemSenseData = async (req, context) => {
   try {
     const out = {};
 
-    const gatewayId = req.query.gatewayId || null;
-    const start = req.query.start || null;
-    const end = req.query.end || null;
+    const gatewayId = req.req_query.gatewayId || null;
+    const start = req.req_query.start || null;
+    const end = req.req_query.end || null;
 
     const functionalEndDateTime = end || new Date().toISOString();
 
@@ -613,7 +613,7 @@ app.http("chem-sense", {
       });
 
       // Validate input.
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         gatewayId: "required|alpha_dash",
         start: "iso8601",
         end: "iso8601",
@@ -624,7 +624,7 @@ app.http("chem-sense", {
       }
 
       // Ensure that the authorized user is allowed to see this particular device ID.
-      await Auth.canAccessDevice(req.query.gatewayId, authorizedUser, db);
+      await Auth.canAccessDevice(req.req_query.gatewayId, authorizedUser, db);
 
       const chemSenseData = await getChemSenseData(req, context);
       return { ...chemSenseData };
@@ -641,7 +641,7 @@ app.http("chem-sense-data", {
       req = Common.parseRequest(req);
 
       // Validate input.
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         gatewayId: "required|alpha_dash",
         start: "iso8601",
         end: "iso8601",

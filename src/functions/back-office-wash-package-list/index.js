@@ -21,7 +21,7 @@ app.http("back-office-wash-package-list", {
         requireBusinessId: true,
       });
 
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         lid: "required|uuid",
       });
 
@@ -59,7 +59,7 @@ app.http("back-office-wash-package-list", {
       FROM locations
       WHERE id = $1
     `,
-        [req.query.lid]
+        [req.req_query.lid]
       );
       // context.log('Location query:', locationQuery.rows);
       if (locationQuery.rowCount === 0) {

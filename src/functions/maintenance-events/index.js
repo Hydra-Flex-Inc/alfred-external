@@ -15,7 +15,7 @@ app.http("maintenance-events", {
       // Retrieve the authorized user.
       const authorizedUser = await Auth.authorizeUser(req, db);
 
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         lid: "uuid",
         count: "integer",
       });
@@ -38,14 +38,14 @@ app.http("maintenance-events", {
       ];
 
       // Optionally, filter by a single location.
-      if (req.query.lid) {
-        params.push(req.query.lid);
+      if (req.req_query.lid) {
+        params.push(req.req_query.lid);
         predicates.push(`locations.id = $${params.length}`);
       }
 
       // This query can return a massive amount of rows. Set a reasonable limit as a default.
-      if (req.query.count) {
-        params.push(parseInt(req.query.count, 10));
+      if (req.req_query.count) {
+        params.push(parseInt(req.req_query.count, 10));
       } else {
         params.push(30000);
       }

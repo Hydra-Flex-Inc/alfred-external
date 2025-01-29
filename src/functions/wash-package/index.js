@@ -6,7 +6,7 @@ const Validator = require("../../../validator");
 const ErrorHandler = require("../../../errorHandler");
 
 const getWashPackages = async (context, req) => {
-  const validator = new Validator(req.query, {
+  const validator = new Validator(req.req_query, {
     gatewayId: "string|required",
   });
 
@@ -29,7 +29,7 @@ const getWashPackages = async (context, req) => {
     LEFT JOIN chemical_containers cc
       ON cc.id = cwp2cc.chemical_container_id
   WHERE
-    cwp.iot_hub_device_id = '${req.query.gatewayId}'
+    cwp.iot_hub_device_id = '${req.req_query.gatewayId}'
     AND cwp.deleted_at IS NULL
     AND cwp2cc.deleted_at IS NULL
     AND cc.deleted_at IS NULL

@@ -8,31 +8,35 @@ const Common = require("../../../common");
 const executeFunctionLogic = async (req, context) => {
   try {
     // prepare params
-    const params = [req.query.deviceId];
+    const params = [req.req_query.deviceId];
     const predicates = [`vns.device_id = $1`];
 
     // Handling 'start' and 'end' parameters with preference to 'start'
-    if (req.query.start) {
-      const startTime = Math.floor(new Date(req.query.start).getTime() / 1000);
+    if (req.req_query.start) {
+      const startTime = Math.floor(
+        new Date(req.req_query.start).getTime() / 1000
+      );
       params.push(startTime);
       predicates.push(`vns.local_utc_timestamp >= $${params.length}`);
-    } else if (req.query.since && Number.isFinite(+req.query.since)) {
-      params.push(+req.query.since);
+    } else if (req.req_query.since && Number.isFinite(+req.req_query.since)) {
+      params.push(+req.req_query.since);
       predicates.push(`vns.local_utc_timestamp >= $${params.length}`);
     }
 
-    if (req.query.end) {
-      const endTime = Math.floor(new Date(req.query.end).getTime() / 1000);
+    if (req.req_query.end) {
+      const endTime = Math.floor(new Date(req.req_query.end).getTime() / 1000);
       params.push(endTime);
       predicates.push(`vns.local_utc_timestamp <= $${params.length}`);
     }
     // This query can return a massive amount of rows. Set a reasonable limit as a default.
-    const limit = Number.isFinite(+req.query?.count) ? +req.query.count : 10000;
+    const limit = Number.isFinite(+req.req_query?.count)
+      ? +req.req_query.count
+      : 10000;
     params.push(limit);
 
     let query;
-    const bucketMinutes = Number.isFinite(+req.query?.bucketMinutes)
-      ? +req.query.bucketMinutes
+    const bucketMinutes = Number.isFinite(+req.req_query?.bucketMinutes)
+      ? +req.req_query.bucketMinutes
       : null;
 
     if (bucketMinutes && bucketMinutes > 0) {
@@ -120,7 +124,7 @@ app.http("panel-summary", {
       });
 
       // Validate input.
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         deviceId: "required|alpha_dash",
         since: "integer",
         start: "iso8601",
@@ -134,7 +138,7 @@ app.http("panel-summary", {
       }
 
       // Ensure that the authorized user is allowed to see this particular device ID.
-      await Auth.canAccessDevice(req.query.deviceId, authorizedUser, db);
+      await Auth.canAccessDevice(req.req_query.deviceId, authorizedUser, db);
       const out = await executeFunctionLogic(req, context);
       return {
         body: JSON.stringify(out),
@@ -155,7 +159,7 @@ app.http("panel-summary-data", {
       req = Common.parseRequest(req);
 
       // Validate input.
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         deviceId: "required|alpha_dash",
         since: "integer",
         start: "iso8601",

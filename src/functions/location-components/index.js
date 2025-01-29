@@ -18,7 +18,7 @@ app.http("location-components", {
       });
 
       // Validate input.
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         lid: "required|uuid",
       });
 
@@ -27,7 +27,7 @@ app.http("location-components", {
       }
 
       // prepare params
-      const params = [req.query.lid, authorizedUser.business_id];
+      const params = [req.req_query.lid, authorizedUser.business_id];
       const predicates = [
         "l.id = $1",
         "l.business_id = $2",

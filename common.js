@@ -1,10 +1,12 @@
 const parseRequest = (req) => {
+  req.req_headers = {};
   req.headers.forEach((value, name) => {
-    req.headers[name] = value;
+    req.req_headers[name] = value;
   });
 
   // Parse the query string into an object
-  req.query = Object.fromEntries(req.query.entries());
+  req.req_query = {};
+  req.req_query = Object.fromEntries(req.query.entries());
 
   return req;
 };

@@ -14,8 +14,8 @@ app.http("remove-cookie", {
       // Only proceed if there is actually a cookie to remove. Otherwise this method
       // can be used to discover that we use an HFI_ALFRED_AUTH_TOKEN cookie, without
       // actually having been logged in.
-      const cookies = req.headers.cookie
-        ? cookie.parse(req.headers.cookie)
+      const cookies = req.req_headers.cookie
+        ? cookie.parse(req.req_headers.cookie)
         : {};
       const validator = new Validator(cookies, {
         HFI_ALFRED_AUTH_TOKEN: "required",
@@ -48,7 +48,10 @@ app.http("remove-cookie", {
       };
 
       // Set the cookie to be secure if we are running in a HTTPS environment (production), and adjust CORS settings.
-      if (req.headers["x-forwarded-proto"] === "https" || validLocalhost()) {
+      if (
+        req.req_headers["x-forwarded-proto"] === "https" ||
+        validLocalhost()
+      ) {
         authTokenCookie.secure = true;
         authTokenCookie.sameSite = "none";
       }

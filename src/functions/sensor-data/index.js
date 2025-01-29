@@ -12,7 +12,7 @@ app.http("sensor-data", {
     try {
       req = Common.parseRequest(req);
 
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         gatewayId: "required|alpha_dash",
         start: "iso8601",
         end: "iso8601",
@@ -43,9 +43,9 @@ app.http("sensor-data", {
 
       // Query all sensors connected to the gateway
       const query_values = [
-        req.query.gatewayId,
-        req.query.start,
-        req.query.end,
+        req.req_query.gatewayId,
+        req.req_query.start,
+        req.req_query.end,
       ];
 
       const sensors = await db.tsdbQuery(tdsbQuery, query_values);

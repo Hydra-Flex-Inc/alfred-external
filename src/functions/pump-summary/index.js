@@ -8,29 +8,36 @@ const ErrorHandler = require("../../../errorHandler");
 const executeFunctionLogic = async (req, context) => {
   try {
     // prepare params
-    const params = [req.query.deviceId];
+    const params = [req.req_query.deviceId];
     const predicates = [`ps.device_id = $1`];
 
-    if (req.query.start) {
-      const startTime = Math.floor(new Date(req.query.start).getTime() / 1000);
+    if (req.req_query.start) {
+      const startTime = Math.floor(
+        new Date(req.req_query.start).getTime() / 1000
+      );
       predicates.push(`ps.local_utc_timestamp >= $${params.length + 1}`);
       params.push(startTime);
-    } else if (req.query.since && Number.isFinite(parseInt(req.query.since))) {
+    } else if (
+      req.req_query.since &&
+      Number.isFinite(parseInt(req.req_query.since))
+    ) {
       predicates.push(`ps.local_utc_timestamp >= $${params.length + 1}`);
-      params.push(parseInt(req.query.since));
+      params.push(parseInt(req.req_query.since));
     }
 
-    if (req.query.end) {
-      const endTime = Math.floor(new Date(req.query.end).getTime() / 1000);
+    if (req.req_query.end) {
+      const endTime = Math.floor(new Date(req.req_query.end).getTime() / 1000);
       predicates.push(`ps.local_utc_timestamp <= $${params.length + 1}`);
       params.push(endTime);
     }
 
-    const limit = Number.isFinite(+req.query?.count) ? +req.query.count : 10000;
+    const limit = Number.isFinite(+req.req_query?.count)
+      ? +req.req_query.count
+      : 10000;
     params.push(limit);
 
-    const bucketMinutes = Number.isFinite(+req.query?.bucketMinutes)
-      ? +req.query.bucketMinutes
+    const bucketMinutes = Number.isFinite(+req.req_query?.bucketMinutes)
+      ? +req.req_query.bucketMinutes
       : null;
 
     let query;
@@ -102,7 +109,7 @@ app.http("pump-summary", {
       });
 
       // Validate input.
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         deviceId: "required|alpha_dash",
         since: "integer", // This will be used if start is not provided
         start: "iso8601",
@@ -116,7 +123,7 @@ app.http("pump-summary", {
       }
 
       // Ensure that the authorized user is allowed to see this particular device ID.
-      await Auth.canAccessDevice(req.query.deviceId, authorizedUser, db);
+      await Auth.canAccessDevice(req.req_query.deviceId, authorizedUser, db);
       const out = await executeFunctionLogic(req, context);
       return {
         body: JSON.stringify(out),
@@ -137,7 +144,7 @@ app.http("pump-summary-data", {
       req = Common.parseRequest(req);
 
       // Validate input.
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         deviceId: "required|alpha_dash",
         since: "integer", // This will be used if start is not provided
         start: "iso8601",

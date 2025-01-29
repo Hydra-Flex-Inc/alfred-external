@@ -16,7 +16,7 @@ app.http("system-alert-summary", {
       const authorizedUser = await Auth.authorizeUser(req, db);
 
       // Validate input.
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         lid: "uuid",
         since: "integer",
         count: "integer",
@@ -47,7 +47,7 @@ app.http("system-alert-summary", {
       };
 
       // If totalCount specified, grab the total count of alerts without later filtering
-      if (req.query.totalCount) {
+      if (req.req_query.totalCount) {
         const countQuery = `
         SELECT count(*) AS alert_count
         FROM users
@@ -66,14 +66,14 @@ app.http("system-alert-summary", {
       }
 
       // Optionally, filter by a single location.
-      if (req.query.lid) {
-        params.push(req.query.lid);
+      if (req.req_query.lid) {
+        params.push(req.req_query.lid);
         predicates.push(`locations.id = $${params.length}`);
       }
 
       // If locationCount specified, grab the filtered count including the location filter
       // Requires that a location id is provided
-      if (req.query.lid && req.query.locationCount) {
+      if (req.req_query.lid && req.req_query.locationCount) {
         const countQuery = `
         SELECT count(*) AS alert_count
         FROM users
@@ -92,21 +92,21 @@ app.http("system-alert-summary", {
       }
 
       // Limit to alerts since a certain time.
-      if (req.query.since) {
-        params.push(parseInt(req.query.since, 10));
+      if (req.req_query.since) {
+        params.push(parseInt(req.req_query.since, 10));
         predicates.push(`unixtime > $${params.length}`);
       }
 
       // This query can return a massive amount of rows. Set a reasonable limit as a default.
-      if (req.query.count) {
-        params.push(parseInt(req.query.count, 10));
+      if (req.req_query.count) {
+        params.push(parseInt(req.req_query.count, 10));
       } else {
         params.push(30000);
       }
 
       // Add the offset to do paginated queries
-      if (req.query.offset) {
-        params.push(parseInt(req.query.offset, 10));
+      if (req.req_query.offset) {
+        params.push(parseInt(req.req_query.offset, 10));
       } else {
         params.push(0);
       }

@@ -12,11 +12,11 @@ const executeFunctionLogic = async (req, context) => {
     const params = [];
 
     predicates.push(`xref.location_id = $${predicates.length + 1}`);
-    params.push(req.query.locationId);
+    params.push(req.req_query.locationId);
 
-    if (req.query.fieldTrialId) {
+    if (req.req_query.fieldTrialId) {
       predicates.push(`ft.id = $${predicates.length + 1}`);
-      params.push(req.query.fieldTrialId);
+      params.push(req.req_query.fieldTrialId);
       const accessQuery = `SELECT COUNT(*)
     FROM field_trials ft
     LEFT JOIN field_trials_to_locations xref ON ft.id = xref.field_trial_id
@@ -54,7 +54,7 @@ app.http("field-trials", {
         requireBusinessId: true,
       });
 
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         locationId: "uuid|required",
         fieldTrialId: "uuid",
       });
@@ -64,7 +64,11 @@ app.http("field-trials", {
       }
 
       // Ensure that the authorized user is allowed to see this particular location
-      await Auth.canAccessLocation(req.query.locationId, authorizedUser, db);
+      await Auth.canAccessLocation(
+        req.req_query.locationId,
+        authorizedUser,
+        db
+      );
 
       const out = await executeFunctionLogic(req, context);
 
@@ -86,7 +90,7 @@ app.http("field-trials-data", {
     try {
       req = Common.parseRequest(req);
 
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         locationId: "uuid|required",
         fieldTrialId: "uuid",
       });

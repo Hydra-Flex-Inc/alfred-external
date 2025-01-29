@@ -8,7 +8,7 @@ const ErrorHandler = require("../../../errorHandler");
 const getAdoptionCodeData = async (req, context) => {
   try {
     // prepare params
-    const params = [req.query.adoption_code];
+    const params = [req.req_query.adoption_code];
     const predicates = [
       "lac.code = $1",
       "lac.deleted_at IS NULL",
@@ -69,7 +69,7 @@ WHERE ${predicates.join(" AND ")}
 
     // Combine the results of the 2 queries.
     const out = {
-      adoption_code: req.query.adoption_code,
+      adoption_code: req.req_query.adoption_code,
       location: location,
     };
 
@@ -90,7 +90,7 @@ app.http("adoption-code-check", {
       });
 
       // Validate input.
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         adoption_code: "required|alpha_num",
       });
 
@@ -117,7 +117,7 @@ app.http("adoption-code-check-data", {
       req = Common.parseRequest(req);
 
       // Validate input.
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         adoption_code: "required|alpha_num",
       });
 

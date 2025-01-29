@@ -16,7 +16,9 @@ module.exports = {
    */
   async authorizeUser(req, db, options = {}) {
     // Parse & Validate the Auth cookie.
-    const cookies = req.headers.cookie ? cookie.parse(req.headers.cookie) : {};
+    const cookies = req.req_headers.cookie
+      ? cookie.parse(req.req_headers.cookie)
+      : {};
 
     const validator = new Validator(cookies, {
       HFI_ALFRED_AUTH_TOKEN: "required|uuid",
