@@ -6,7 +6,7 @@ const Auth = require("../../../auth");
 const ErrorHandler = require("../../../errorHandler");
 
 app.http("user-update-notification", {
-  methods: ["GET"],
+  methods: ["POST"],
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);
