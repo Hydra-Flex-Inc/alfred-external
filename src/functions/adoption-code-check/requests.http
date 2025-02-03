@@ -10,3 +10,9 @@ GET http://localhost:7071/api/adoption-code-check-data
 ?adoption_code=3Mx9V
 content-type: application/json
 Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+###
+GET https://alfred-api.hydraflexinc.com/alfred-v2/adoption-code-check
+?adoption_code=3Mx9V
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3

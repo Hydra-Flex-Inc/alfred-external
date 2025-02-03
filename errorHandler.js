@@ -23,7 +23,9 @@ module.exports = {
     } else if (error instanceof Error) {
       context.error(error.stack);
 
-      out.status = error?.status || null;
+      // This was previusly defualting to null if there was no status
+      // However, that was preventing the function from returning details about the error.
+      out.status = error?.status || 500;
       out.body.error = error.message;
     } else {
       out.body.error = error; // assume this is a simple string
