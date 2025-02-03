@@ -317,6 +317,148 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorProperties"
+    TotalValveCyclesResponse:
+      description: Total valve cycles retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                modbusId:
+                  type: integer
+                v1:
+                  type: integer
+                v2:
+                  type: integer
+                v3:
+                  type: integer
+                v4:
+                  type: integer
+                v5:
+                  type: integer
+                v6:
+                  type: integer
+                v7:
+                  type: integer
+    PumpStatusResponse:
+      description: Pump status retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                unixtime:
+                  type: integer
+                time:
+                  type: string
+                  format: date-time
+                deviceId:
+                  type: string
+                modbusId:
+                  type: string
+                rpm:
+                  type: number
+                  format: float
+                amps:
+                  type: number
+                  format: float
+                watts:
+                  type: number
+                  format: float
+                freqConvTemp:
+                  type: number
+                  format: float
+                electronicsTemp:
+                  type: number
+                  format: float
+                outletPressure:
+                  type: number
+                  format: float
+                frequency:
+                  type: number
+                  format: float
+    PumpSummaryResponse:
+      description: Pump summary retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                unixtime:
+                  type: integer
+                time:
+                  type: string
+                  format: date-time
+                deviceId:
+                  type: string
+                modbusId:
+                  type: string
+                relativePerformance:
+                  type: number
+                  format: float
+                  description: Relative performance of the pump. Averaged when timebucketed.
+                actualSetpoint:
+                  type: number
+                  format: float
+                  description: Actual setpoint of the pump. Averaged when timebucketed.
+                userSetpoint:
+                  type: number
+                  format: float
+                  description: User setpoint of the pump. Averaged when timebucketed.
+                maxFlowLimit:
+                  type: number
+                  format: float
+                  description: Maximum flow limit of the pump. Averaged when timebucketed.
+                dcVoltage:
+                  type: number
+                  format: float
+                  description: DC voltage of the pump. Averaged when timebucketed.
+                runTime:
+                  type: integer
+                  description: Run time of the pump. MAX value when timebucketed.
+                onTime:
+                  type: integer
+                  description: On time of the pump. MAX value when timebucketed.
+                totalKWH:
+                  type: number
+                  format: float
+                  description: Total KWH of the pump. Max value when timebucketed.
+                starts:
+                  type: integer
+    SensorDataResponse:
+      description: Sensor data retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                gateway_id:
+                  type: string
+                  format: alpha_dash
+                device_id:
+                  type: string
+                sensor_data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      time:
+                        type: string
+                        format: date-time
+                      value:
+                        type: integer
+                name:
+                  type: string
+                container_size_gals:
+                  type: string
     LocationComponentsResponse:
       description: Components retrieved successfully
       content:
@@ -1832,7 +1974,7 @@ paths:
   /location-hours-data:
     post:
       operationId: updateLocationHoursData
-      summary: Update location hours
+      summary: (No auth required) Update location hours
       description: >
         The `hours` array should contain objects with the following properties:
         * `day` - The day of the week (1-7), Monday being 1
@@ -1906,7 +2048,7 @@ paths:
   /location-name-data:
     get:
       operationId: getLocationNameData
-      summary: Retrieve location name
+      summary: (No auth required) Retrieve location name
       parameters:
         - name: gatewayId
           in: query
@@ -2002,7 +2144,7 @@ paths:
           $ref: "#/components/responses/ErrorResponse500"
   /panel-summary-data:
     get:
-      summary: Retrieve panel summary. Raw data is total over `elapsedSecs` period. All values are `SUM`'d when timebucketed.
+      summary: (No auth required) Retrieve panel summary. Raw data is total over `elapsedSecs` period. All values are `SUM`'d when timebucketed.
       operationId: getPanelSummaryData
       parameters:
         - name: deviceId
@@ -2128,66 +2270,50 @@ paths:
             type: integer
       responses:
         "200":
-          description: Pump status retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    unixtime:
-                      type: integer
-                    time:
-                      type: string
-                      format: date-time
-                    deviceId:
-                      type: string
-                    modbusId:
-                      type: string
-                    rpm:
-                      type: number
-                      format: float
-                    amps:
-                      type: number
-                      format: float
-                    watts:
-                      type: number
-                      format: float
-                    freqConvTemp:
-                      type: number
-                      format: float
-                    electronicsTemp:
-                      type: number
-                      format: float
-                    outletPressure:
-                      type: number
-                      format: float
-                    frequency:
-                      type: number
-                      format: float
+          $ref: "#/components/responses/PumpStatusResponse"
         "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
         "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+          $ref: "#/components/responses/ErrorResponse500"
+  /pump-status-data:
+    get:
+      summary: (No auth required) Retrieve pump status. All data averaged when timebucketed.
+      operationId: getPumpStatusData
+      parameters:
+        - name: deviceId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: alpha_dash
+        - name: since
+          in: query
+          schema:
+            type: integer
+        - name: count
+          description: >
+            Limit the number of returned rows.
+          in: query
+          schema:
+            type: integer
+            default: 10000
+        - name: bucketMinutes
+          description: >
+            The number of minutes to bucket the data. If this is not included, the raw data will be returned.
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          $ref: "#/components/responses/PumpStatusResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
   /pump-summary:
     get:
       summary: Retrieve pump summary
@@ -2218,77 +2344,50 @@ paths:
             type: integer
       responses:
         "200":
-          description: Pump summary retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    unixtime:
-                      type: integer
-                    time:
-                      type: string
-                      format: date-time
-                    deviceId:
-                      type: string
-                    modbusId:
-                      type: string
-                    relativePerformance:
-                      type: number
-                      format: float
-                      description: Relative performance of the pump. Averaged when timebucketed.
-                    actualSetpoint:
-                      type: number
-                      format: float
-                      description: Actual setpoint of the pump. Averaged when timebucketed.
-                    userSetpoint:
-                      type: number
-                      format: float
-                      description: User setpoint of the pump. Averaged when timebucketed.
-                    maxFlowLimit:
-                      type: number
-                      format: float
-                      description: Maximum flow limit of the pump. Averaged when timebucketed.
-                    dcVoltage:
-                      type: number
-                      format: float
-                      description: DC voltage of the pump. Averaged when timebucketed.
-                    runTime:
-                      type: integer
-                      description: Run time of the pump. MAX value when timebucketed.
-                    onTime:
-                      type: integer
-                      description: On time of the pump. MAX value when timebucketed.
-                    totalKWH:
-                      type: number
-                      format: float
-                      description: Total KWH of the pump. Max value when timebucketed.
-                    starts:
-                      type: integer
+          $ref: "#/components/responses/PumpSummaryResponse"
         "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
         "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+          $ref: "#/components/responses/ErrorResponse500"
+  /pump-summary-data:
+    get:
+      summary: (No auth required) Retrieve pump summary
+      operationId: getPumpSummaryData
+      parameters:
+        - name: deviceId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: alpha_dash
+        - name: since
+          in: query
+          schema:
+            type: integer
+        - name: count
+          description: >
+            Limit the number of returned rows.
+          in: query
+          schema:
+            type: integer
+            default: 10000
+        - name: bucketMinutes
+          description: >
+            The number of minutes to bucket the data. If this is not included, the raw data will be returned.
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          $ref: "#/components/responses/PumpSummaryResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
   /remove-cookie:
     get:
       summary: Remove a specific cookie
@@ -2331,30 +2430,55 @@ paths:
                         sameSite:
                           type: string
                           example: "none"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
         "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                    example: "HTTP_401"
-                  message:
-                    type: string
-                    example: "Unauthorized"
+          $ref: "#/components/responses/ErrorResponse401"
         "500":
-          description: Internal Server Error
+          $ref: "#/components/responses/ErrorResponse500"
+  /sensor-data:
+    get:
+      summary: Retrieve sensor data
+      operationId: getSensorData
+      parameters:
+        - name: gatewayID
+          in: query
+          required: true
+          schema:
+            type: string
+            format: alpha_dash
+        - name: start
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          $ref: "#/components/responses/SensorDataResponse"
+        "400":
+          description: Bad request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+                $ref: "#/components/schemas/ErrorProperties"
+              examples:
+                validationError:
+                  summary: Validation Error
+                  value:
+                    code: 400
+                    message: A field is not valid.
+                validSensorsError:
+                  summary: No valid sensors
+                  value:
+                    code: 400
+                    message: No valid sensors found for the given gateway.
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
   /set-cookie:
     post:
       summary: Set a specific cookie
@@ -2384,27 +2508,9 @@ paths:
                 type: string
                 example: "HFI_ALFRED_AUTH_TOKEN=auth_token; Max-Age=3888000; HttpOnly; Secure; SameSite=None"
         "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+          $ref: "#/components/responses/ErrorResponse400"
         "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+          $ref: "#/components/responses/ErrorResponse500"
   /system-alert-block-list:
     post:
       summary: Update system alert block list
@@ -2433,27 +2539,9 @@ paths:
                     items:
                       type: string
         "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+          $ref: "#/components/responses/ErrorResponse400"
         "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+          $ref: "#/components/responses/ErrorResponse500"
   /system-alert-summary:
     get:
       summary: Retrieve system alert summary
@@ -2518,27 +2606,13 @@ paths:
                   locationCount:
                     type: integer
         "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
         "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+          $ref: "#/components/responses/ErrorResponse500"
   /total-valve-cycles:
     get:
       summary: Retrieve total valve cycles
@@ -2551,52 +2625,32 @@ paths:
             type: string
       responses:
         "200":
-          description: Total valve cycles retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    modbusId:
-                      type: integer
-                    v1:
-                      type: integer
-                    v2:
-                      type: integer
-                    v3:
-                      type: integer
-                    v4:
-                      type: integer
-                    v5:
-                      type: integer
-                    v6:
-                      type: integer
-                    v7:
-                      type: integer
+          $ref: "#/components/responses/TotalValveCyclesResponse"
         "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
         "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+          $ref: "#/components/responses/ErrorResponse500"
+  /total-valve-cycles-data:
+    get:
+      summary: Retrieve total valve cycles
+      operationId: getTotalValveCyclesData
+      parameters:
+        - name: deviceId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/TotalValveCyclesResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
   /user:
     post:
       summary: Modify user information
@@ -2646,17 +2700,20 @@ paths:
                       description: Location ID
                   phone:
                     type: string
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
         "404":
           description: User not found
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
   /user-invite:
     post:
       summary: Invite a user
@@ -2706,9 +2763,13 @@ paths:
                   business_id:
                     type: string
         "400":
-          description: Validation error or other issue
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
         "500":
-          description: Server error
+          $ref: "#/components/responses/ErrorResponse500"
   /user-locations:
     get:
       summary: Retrieve user and their related business and location information
@@ -2788,6 +2849,10 @@ paths:
                         created_at:
                           type: string
                           format: date-time
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
         "404":
           description: User not found
           content:
@@ -2799,6 +2864,8 @@ paths:
                     type: string
                   message:
                     type: string
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
   /user-remove:
     post:
       summary: Remove a user from a business
@@ -2834,12 +2901,24 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+                $ref: "#/components/schemas/ErrorProperties"
+              examples:
+                validationError:
+                  summary: Validation Error
+                  value:
+                    code: 400
+                    message: A field is not valid.
+                validSensorsError:
+                  summary: Invalid permissions
+                  value:
+                    code: 400
+                    message: The logged in user cannot remove themself
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
   /user-update-notifications:
     post:
       summary: Update user notification preferences for email and push notifications
@@ -2860,15 +2939,15 @@ paths:
         "200":
           description: Successful operation
         "400":
-          description: Bad request
+          $ref: "#/components/responses/ErrorResponse400"
         "401":
-          description: Unauthorized
+          $ref: "#/components/responses/ErrorResponse401"
         "403":
-          description: Forbidden
+          $ref: "#/components/responses/ErrorResponse403"
         "404":
-          description: Not found
+          $ref: "#/components/responses/ErrorResponse404"
         "500":
-          description: Internal server error
+          $ref: "#/components/responses/ErrorResponse500"
   /user-verify-email:
     post:
       summary: Send a user email verification
@@ -2899,27 +2978,131 @@ paths:
                   name:
                     type: string
         "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
         "500":
-          description: Internal Server Error
+          $ref: "#/components/responses/ErrorResponse500"
+  /users:
+    get:
+      summary: Get all users in your business
+      operationId: getUsers
+      responses:
+        "200":
+          description: Successfully found users
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+                  user:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user_id:
+                          type: string
+                          format: uuid
+                          description: ID of the user
+                        name:
+                          type: string
+                        picture:
+                          type: string
+                          description: url to picture
+                        nickname:
+                          type: string
+                        updated_at:
+                          type: string
+                          format: date-time
+                        created_at:
+                          type: string
+                          format: date-time
+                        last_password_reset:
+                          type: string
+                          format: date-time
+                        email:
+                          type: string
+                        email_verified:
+                          type: boolean
+                        identities:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              user_id:
+                                type: string
+                              provider:
+                                type: string
+                              isSocial:
+                                type: boolean
+                              connection:
+                                type: string
+                        last_login:
+                          type: string
+                          format: date-time
+                        last_ip:
+                          type: string
+                          format: date-time
+                        logins_count:
+                          type: integer
+                        auth0_id:
+                          type: string
+                        system_alerts_block_list:
+                          oneOf:
+                            - type: "null"
+                            - type: array
+                              items:
+                                type: string
+                        wants_email:
+                          type: boolean
+                        wants_push:
+                          type: boolean
+                        role_type:
+                          type: string
+                        locs:
+                          type: array
+                          items:
+                            type: string
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+              examples:
+                validationError:
+                  summary: No users found
+                  value:
+                    code: 404
+                    message: No users found.
+                validSensorsError:
+                  summary: Role type error
+                  value:
+                    code: 404
+                    message: Unrecognized `role_type`
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+              examples:
+                validationError:
+                  summary: Internal server error
+                  value:
+                    code: 500
+                    message: Internal server error
+                validSensorsError:
+                  summary: Auth0 Error
+                  value:
+                    code: 500
+                    message: Auth0 User Fetch Issue
   /valve-maintenance:
     post:
       summary: Update a maintenance event
@@ -2954,28 +3137,30 @@ paths:
                     completing_user_id:
                       type: string
                       format: uuid
+
         "400":
           description: Bad request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+                $ref: "#/components/schemas/ErrorProperties"
+              examples:
+                validationError:
+                  summary: Validation Error
+                  value:
+                    code: 400
+                    message: A field is not valid.
+                validSensorsError:
+                  summary: Cannot find maintenance event
+                  value:
+                    code: 400
+                    message: This maintenance event does not exist, was deleted, or replaced by an updated maintenance event."
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
         "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+          $ref: "#/components/responses/ErrorResponse500"
   /vanity-stats:
     get:
       summary: Retrieve vanity statistics
@@ -2997,18 +3182,10 @@ paths:
                   centsSavedPerSecond:
                     type: integer
         "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: string
-                  message:
-                    type: string
+          $ref: "#/components/responses/ErrorResponse500"
   /wash-package:
     get:
+      operationId: getWashPackages
       summary: Retrieve wash packages
       parameters:
         - name: gatewayId
@@ -3026,8 +3203,21 @@ paths:
                 items:
                   $ref: "#/components/schemas/WashPackage"
         "400":
-          description: Validation error
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          description: Method does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
     post:
+      operationId: createWashPackages
       summary: Create a new wash package
       requestBody:
         required: true
@@ -3046,8 +3236,21 @@ paths:
                   washPackageId:
                     type: string
         "400":
-          description: Validation error
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          description: Method does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
     put:
+      operationId: updateWashPackages
       summary: Update a wash package
       requestBody:
         required: true
@@ -3059,8 +3262,21 @@ paths:
         "200":
           description: Successful operation
         "400":
-          description: Validation error
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          description: Method does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
     delete:
+      operationId: deleteWashPackages
       summary: Delete a wash package
       requestBody:
         required: true
@@ -3078,4 +3294,124 @@ paths:
         "200":
           description: Successful operation
         "400":
-          description: Validation error
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          description: Method does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /wash-package-data:
+    get:
+      operationId: getWashPackagesData
+      summary: (No auth required) Retrieve wash packages
+      parameters:
+        - name: gatewayId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WashPackage"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "404":
+          description: Method does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+    post:
+      operationId: createWashPackagesData
+      summary: (No auth required) Create a new wash package
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WashPackageInput"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  washPackageId:
+                    type: string
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "404":
+          description: Method does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+    put:
+      operationId: updateWashPackagesData
+      summary: (No auth required) Update a wash package
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WashPackageInput"
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "404":
+          description: Method does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+    delete:
+      operationId: deleteWashPackagesData
+      summary: (No auth required) Delete a wash package
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                washPackageId:
+                  type: string
+                  format: uuid
+              required:
+                - washPackageId
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "404":
+          description: Method does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
