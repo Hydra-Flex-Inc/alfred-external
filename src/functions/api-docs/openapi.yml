@@ -17,6 +17,8 @@ info:
     * One in TimescaleDB containing the time series data from the IoT Hub
   version: 2.0.0
 servers:
+  - url: http://localhost:7071/api
+    description: "Development server"
   - url: https://alfred-api.hydraflexinc.com/alfred-v2
     description: "Production server"
 
@@ -536,6 +538,50 @@ components:
                   enum: ["main_pulse", "reclaim_pulse"]
                 value:
                   type: number
+    SystemAlertSummaryResponse:
+      description: System alert summary retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              alerts:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    location_id:
+                      type: string
+                    component_id:
+                      type: string
+                    component_name:
+                      type: string
+                    component_type:
+                      type: string
+              totalCount:
+                type: integer
+              locationCount:
+                type: integer
+    ValveMaintenanceResponse:
+      description: Maintenance event updated successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                completed_at:
+                  type: string
+                  format: date-time
+                completing_user_id:
+                  type: string
+                  format: uuid
     LocationHoursResponse:
       description: Successful operation
       content:
@@ -1215,6 +1261,67 @@ paths:
           $ref: "#/components/responses/ErrorResponse401"
         "403":
           $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /component-data:
+    post:
+      summary: Update a component
+      operationId: updateComponentData
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  description: ID of the component to update
+                gateway_id:
+                  type: string
+                  format: alpha_dash
+                  description: ID of the gateway
+                name:
+                  type: string
+                  description: New name of the component
+              required:
+                - id
+                - name
+                - device_id
+      responses:
+        "200":
+          description: Component updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  gateway_id:
+                    type: string
+                    format: alpha_dash
+                  name:
+                    type: string
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+              examples:
+                validationError:
+                  summary: Validation Error
+                  value:
+                    code: 400
+                    message: A field is not valid.
+                noDuplicateNames:
+                  summary: No duplicate names
+                  value:
+                    code: "400"
+                    message: "Each component must have a unique name."
         "500":
           $ref: "#/components/responses/ErrorResponse500"
   /dashboard-prefs:
@@ -1918,6 +2025,27 @@ paths:
           $ref: "#/components/responses/ErrorResponse404"
         "500":
           $ref: "#/components/responses/ErrorResponse500"
+  /location-components-data:
+    get:
+      summary: Retrieve components for a location
+      operationId: getLocationComponentsData
+      parameters:
+        - name: gateway_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: alpha_dash
+            description: Gateway ID of the location
+      responses:
+        "200":
+          $ref: "#/components/responses/LocationComponentsResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "404":
+          $ref: "#/components/responses/ErrorResponse404"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
   /location-hours:
     post:
       operationId: updateLocationHours
@@ -2091,6 +2219,30 @@ paths:
           $ref: "#/components/responses/ErrorResponse401"
         "403":
           $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /maintenance-events-data:
+    get:
+      summary: Retrieve maintenance events
+      operationId: getMaintenanceEventsData
+      parameters:
+        - name: gateway_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: alpha_dash
+            description: Gateway ID of the location
+        - name: count
+          in: query
+          schema:
+            type: integer
+            description: Limit the number of returned rows
+      responses:
+        "200":
+          $ref: "#/components/responses/MaintenanceEventsResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
         "500":
           $ref: "#/components/responses/ErrorResponse500"
   /panel-summary:
@@ -2580,37 +2732,58 @@ paths:
             type: boolean
       responses:
         "200":
-          description: System alert summary retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  alerts:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        location_id:
-                          type: string
-                        component_id:
-                          type: string
-                        component_name:
-                          type: string
-                        component_type:
-                          type: string
-                  totalCount:
-                    type: integer
-                  locationCount:
-                    type: integer
+          $ref: "#/components/responses/SystemAlertSummaryResponse"
         "400":
           $ref: "#/components/responses/ErrorResponse400"
         "401":
           $ref: "#/components/responses/ErrorResponse401"
         "403":
           $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /system-alert-summary-data:
+    get:
+      summary: Retrieve system alert summary
+      operationId: getSystemAlertSummaryData
+      parameters:
+        - name: gateway_ids
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              format: alpha_dash
+        - name: since
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: count
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: totalCount
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: locationCount
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          $ref: "#/components/responses/SystemAlertSummaryResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
         "500":
           $ref: "#/components/responses/ErrorResponse500"
   /total-valve-cycles:
@@ -3050,11 +3223,9 @@ paths:
                         auth0_id:
                           type: string
                         system_alerts_block_list:
-                          oneOf:
-                            - type: "null"
-                            - type: array
-                              items:
-                                type: string
+                          type: array
+                          items:
+                            type: string
                         wants_email:
                           type: boolean
                         wants_push:
@@ -3120,24 +3291,7 @@ paths:
                   description: ID of the maintenance event to update
       responses:
         "200":
-          description: Maintenance event updated successfully
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      format: uuid
-                    completed_at:
-                      type: string
-                      format: date-time
-                    completing_user_id:
-                      type: string
-                      format: uuid
-
+          $ref: "#/components/responses/ValveMaintenanceResponse"
         "400":
           description: Bad request
           content:
@@ -3159,6 +3313,47 @@ paths:
           $ref: "#/components/responses/ErrorResponse401"
         "403":
           $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /valve-maintenance-data:
+    post:
+      summary: Update a maintenance event
+      operationId: updateMaintenanceEventData
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                maintenanceId:
+                  type: string
+                  format: uuid
+                  description: ID of the maintenance event to update
+                userId:
+                  type: string
+                  format: uuid
+                  description: ID of the user who is doing the updating.
+      responses:
+        "200":
+          $ref: "#/components/responses/ValveMaintenanceResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+              examples:
+                validationError:
+                  summary: Validation Error
+                  value:
+                    code: 400
+                    message: A field is not valid.
+                validSensorsError:
+                  summary: Cannot find maintenance event
+                  value:
+                    code: 400
+                    message: This maintenance event does not exist, was deleted, or replaced by an updated maintenance event."
         "500":
           $ref: "#/components/responses/ErrorResponse500"
   /vanity-stats:
@@ -3278,18 +3473,13 @@ paths:
     delete:
       operationId: deleteWashPackages
       summary: Delete a wash package
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                washPackageId:
-                  type: string
-                  format: uuid
-              required:
-                - washPackageId
+      parameters:
+        - name: washPackageId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: Successful operation
@@ -3390,18 +3580,13 @@ paths:
     delete:
       operationId: deleteWashPackagesData
       summary: (No auth required) Delete a wash package
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                washPackageId:
-                  type: string
-                  format: uuid
-              required:
-                - washPackageId
+      parameters:
+        - name: washPackageId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         "200":
           description: Successful operation

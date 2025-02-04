@@ -7,3 +7,14 @@ Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
   "id": "52c5af99-bea5-419b-aa8c-74c4402cbdc9",
   "name": "Pump 2"
 }
+
+### No auth call
+POST http://localhost:7071/api/component-data
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
+
+{
+  "id": "52c5af99-bea5-419b-aa8c-74c4402cbdc9",
+  "gateway_id": "012320EBFD559D0AEE",
+  "name": "Pump 3"
+}
