@@ -7,7 +7,7 @@ Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
 {
   "location_id": "df557bad-c51f-40a6-cb54-73aa3bdf6f98",
   "hours": [
-    { "day": 1, "open": "08:00", "close": "20:00" },
+    { "day": 1, "open": "07:00", "close": "20:00" },
     { "day": 2, "open": "08:00", "close": "20:00" },
     { "day": 3, "open": "08:00", "close": "20:00", "closed": true },
     { "day": 4, "open": "08:00", "close": "20:00" },
@@ -95,5 +95,23 @@ Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
     { "day": 5, "open": "08:00", "close": "20:00" },
     { "day": 6, "open": "09:00", "close": "18:00" },
     { "day": 7, "open": "10:00", "close": "09:00" }
+  ]
+}
+
+### No auth call. SUCCESS: Valid Hours Body
+POST http://localhost:7071/api/location-hours-data
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
+
+{
+  "location_id": "df557bad-c51f-40a6-cb54-73aa3bdf6f98",
+  "hours": [
+    { "day": 1, "open": "08:00", "close": "20:00" },
+    { "day": 2, "open": "08:00", "close": "20:00" },
+    { "day": 3, "open": "08:00", "close": "20:00", "closed": true },
+    { "day": 4, "open": "08:00", "close": "20:00" },
+    { "day": 5, "closed": true },
+    { "day": 6, "open": "09:00", "close": "18:00" },
+    { "day": 7, "open": "10:00", "close": "16:00" }
   ]
 }

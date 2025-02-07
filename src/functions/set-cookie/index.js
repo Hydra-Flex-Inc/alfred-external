@@ -5,6 +5,8 @@ const Validator = require("../../../validator");
 const ErrorHandler = require("../../../errorHandler");
 const jsonwebtoken = require("jsonwebtoken");
 
+// No auth on this so no need to reconfigure
+
 // we may want to move this to an env var or a file to be read, though the latter would mean
 // that we'd need to go async to account for the file read
 const cert = `-----BEGIN CERTIFICATE-----
@@ -32,7 +34,7 @@ app.http("set-cookie", {
     try {
       req = Common.parseRequest(req);
       // Validate headers
-      let validator = new Validator(req.headers, {
+      let validator = new Validator(req.req_headers, {
         authorization: "required|jwt",
       });
 
@@ -55,7 +57,7 @@ app.http("set-cookie", {
       }
 
       // parse the JWT out of the authorization header.
-      const jwt = req.headers.authorization.split(" ").pop();
+      const jwt = req.req_headers.authorization.split(" ").pop();
 
       // Throws error if...
       // - token cannot be decoded
@@ -119,7 +121,10 @@ app.http("set-cookie", {
       // Set the cookie to be secure if we are running in a HTTPS environment (production), and adjust CORS settings.
       // Have a check on the localhost key to see if it is a valid instance of localhost
       // with our shared authorized dev key
-      if (req.headers["x-forwarded-proto"] === "https" || validLocalhost()) {
+      if (
+        req.req_headers["x-forwarded-proto"] === "https" ||
+        validLocalhost()
+      ) {
         authTokenCookie.secure = true;
         authTokenCookie.sameSite = "none";
       }

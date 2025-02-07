@@ -1,12 +1,12 @@
 ## good dev request
 POST http://localhost:7071/api/edit-chemical-container
 content-type: application/json
-Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
 
 {
-    "containerId": "61273d76-be47-46e7-94de-0582d5d299df",
+    "containerId": "0c184912-3ce4-4f39-9c8d-69d9b95f9303",
     "chemicalName": "AF2010 1X",
-    "customName": "#10_aaaa",
+    "customName": "#10_aaa",
     "container": "30",
     "valves": [
         {
@@ -15,7 +15,7 @@ Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
         }
     ],
     "code": null,
-    "gatewayId": "0123C489F5D9F652EE",
+    "gatewayId": "advm2-sensor-trial",
     "container_cost": 123.45,
     "currency_code": "USD"
 }
@@ -35,6 +35,29 @@ Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
         {
             "panel": 3,
             "valve": 3
+        }
+    ],
+    "code": null,
+    "gatewayId": "0123C489F5D9F652EE",
+    "container_cost": 123.45,
+    "currency_code": "USD"
+}
+
+
+### no auth request
+POST http://localhost:7071/api/edit-chemical-container-data
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+{
+    "containerId": "0c184912-3ce4-4f39-9c8d-69d9b95f9303",
+    "chemicalName": "AF2010 1X",
+    "customName": "#10_aaa",
+    "container": "30",
+    "valves": [
+        {
+            "panel": 2,
+            "valve": 2
         }
     ],
     "code": null,

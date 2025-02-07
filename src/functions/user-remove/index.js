@@ -5,6 +5,8 @@ const Validator = require("../../../validator");
 const Auth = require("../../../auth");
 const ErrorHandler = require("../../../errorHandler");
 
+// Uses authorization in queries
+
 app.http("user-remove", {
   methods: ["POST"],
   handler: async (req, context) => {

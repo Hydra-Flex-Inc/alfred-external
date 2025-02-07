@@ -24,22 +24,22 @@ const getFlowSenseData = async (req, context) => {
 
     // no if as this is required
     predicates.push(`"gateway_id" = $${params.length + 1}`);
-    params.push(req.query.gatewayId);
+    params.push(req.req_query.gatewayId);
 
-    if (req.query.deviceId) {
+    if (req.req_query.deviceId) {
       predicates.push(`"device_id" = $${params.length + 1}`);
-      params.push(req.query.deviceId);
+      params.push(req.req_query.deviceId);
     }
-    if (req.query.start) {
+    if (req.req_query.start) {
       predicates.push(`time >= $${params.length + 1}::timestamptz`);
-      params.push(req.query.start);
+      params.push(req.req_query.start);
     } else {
       predicates.push(`time >= $${params.length + 1}::timestamptz`);
       params.push(defaultStart); // default to 14 days ago
     }
-    if (req.query.end) {
+    if (req.req_query.end) {
       predicates.push(`time <= $${params.length + 1}::timestamptz`);
-      params.push(req.query.end);
+      params.push(req.req_query.end);
     }
 
     const query = `
@@ -51,7 +51,7 @@ const getFlowSenseData = async (req, context) => {
       FROM (
         SELECT
           time_bucket('${
-            req.query.bucketMinutes
+            req.req_query.bucketMinutes
           } minutes', time) AS time_str, -- have to rename or grouping is messed up
           device_id,
           type,
@@ -72,7 +72,7 @@ const getFlowSenseData = async (req, context) => {
     if (result.rows.length === 0) {
       // ... and the query returned no data...
       context.log("No data found");
-      if (req.query.dev) {
+      if (req.req_query.dev) {
         // If we're in dev mode...
         context.log(
           "We're in dev mode, so we'll return some fake data instead."
@@ -84,13 +84,13 @@ const getFlowSenseData = async (req, context) => {
         // no if as this is required
         fakeDataParams.push(fakeMacAddress);
 
-        if (req.query?.start) {
-          fakeDataParams.push(req.query.start);
+        if (req.req_query?.start) {
+          fakeDataParams.push(req.req_query.start);
         } else {
           fakeDataParams.push(defaultStart); // default to 14 days ago
         }
-        if (req.query?.end) {
-          fakeDataParams.push(req.query.end);
+        if (req.req_query?.end) {
+          fakeDataParams.push(req.req_query.end);
         } else {
           const defaultEnd = new Date().toISOString();
           fakeDataParams.push(defaultEnd); // default to now
@@ -111,14 +111,14 @@ const getFlowSenseData = async (req, context) => {
                 WHEN 
                   EXTRACT(HOUR FROM time) >= 12     -- after 6am CST
                     OR EXTRACT(HOUR FROM time) <= 4 -- before 10pm CST
-                  THEN ROUND((42 * ${+req.query
+                  THEN ROUND((42 * ${+req.req_query
                     .bucketMinutes} + (random() * 6 - 3))::NUMERIC,2)
                   ELSE ROUND((1 + (random() * 2 - 1))::NUMERIC,2)
                 END as value
             FROM generate_series(
               $2::timestamptz,  -- start_date
               $3::timestamptz,  -- end_date
-              INTERVAL '${+req.query.bucketMinutes} minutes'
+              INTERVAL '${+req.req_query.bucketMinutes} minutes'
             ) AS time
             UNION ALL
             SELECT
@@ -128,14 +128,14 @@ const getFlowSenseData = async (req, context) => {
                 WHEN 
                   EXTRACT(HOUR FROM time) >= 12     -- after 6am CST
                     OR EXTRACT(HOUR FROM time) <= 4 -- before 10pm CST
-                  THEN ROUND((58 * ${+req.query
+                  THEN ROUND((58 * ${+req.req_query
                     .bucketMinutes} + (random() * 6 - 3))::NUMERIC,2)
                   ELSE ROUND((1 + (random() * 2 - 1))::NUMERIC,2)
                 END as value
             FROM generate_series(
               $2::timestamptz,  -- start_date
               $3::timestamptz,  -- end_date
-              INTERVAL '${+req.query.bucketMinutes} minutes'
+              INTERVAL '${+req.req_query.bucketMinutes} minutes'
             ) AS time
           ) AS result
           ORDER BY time
@@ -167,7 +167,7 @@ app.http("flow-sense-total-data", {
       req = Common.parseRequest(req);
 
       // Validate input
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         gatewayId: "string|required",
         deviceId: "string", // Not required, as we may want to query all devices, even though for flow-sense there should only ever be one per location
         bucketMinutes: "integer|required", // To aggregate data https://docs.timescale.com/use-timescale/latest/time-buckets/
@@ -199,7 +199,7 @@ app.http("flow-sense-total", {
       });
 
       // Validate input
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         gatewayId: "string|required",
         deviceId: "string", // Not required, as we may want to query all devices, even though for flow-sense there should only ever be one per location
         bucketMinutes: "integer|required", // To aggregate data https://docs.timescale.com/use-timescale/latest/time-buckets/
@@ -213,7 +213,7 @@ app.http("flow-sense-total", {
       }
 
       // Ensure the user has access to the requested data
-      await Auth.canAccessDevice(req.query.gatewayId, authorizedUser, db);
+      await Auth.canAccessDevice(req.req_query.gatewayId, authorizedUser, db);
 
       const flowSenseData = await getFlowSenseData(req, context);
       return { ...flowSenseData };

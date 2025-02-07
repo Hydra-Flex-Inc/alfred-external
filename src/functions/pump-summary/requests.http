@@ -1,5 +1,4 @@
 ### Simple, should limit at two hours' worth or data
-
 GET http://localhost:7071/api/pump-summary
     ?deviceId=advm2-sensor-trial
 content-type: application/json
@@ -29,5 +28,11 @@ GET http://localhost:7071/api/pump-summary
     &start=2023-01-01T00:00:00Z
     &end=2024-01-01T00:00:00Z
     &bucketMinutes=720
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+
+### No auth call
+GET http://localhost:7071/api/pump-summary-data
+    ?deviceId=advm2-sensor-trial
 content-type: application/json
 Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3

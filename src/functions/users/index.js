@@ -4,6 +4,8 @@ const db = require("../../../db");
 const Auth = require("../../../auth");
 const ErrorHandler = require("../../../errorHandler");
 
+// Uses business_id to pull from users table
+
 // Limit per query is 50 users
 const AUTH0_QUERY_USER_SIZE = 50;
 

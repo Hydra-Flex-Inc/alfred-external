@@ -5,6 +5,8 @@ const Validator = require("../../../validator");
 const Auth = require("../../../auth");
 const ErrorHandler = require("../../../errorHandler");
 
+// Uses user_id
+
 app.http("system-alert-block-list", {
   methods: ["POST"],
   handler: async (req, context) => {

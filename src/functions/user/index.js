@@ -9,6 +9,8 @@ const config = require("../../../config");
 config.auth0.scope = "update:users";
 const management = new ManagementClient(config.auth0);
 
+// Uses id, user_id, and business_id
+
 app.http("user", {
   methods: ["POST"],
   handler: async (req, context) => {

@@ -8,6 +8,8 @@ const config = require("../../../config");
 config.auth0.scope = "read:users";
 const management = new ManagementClient(config.auth0);
 
+// Uses authorization in auth0 queries
+
 app.http("user-locations", {
   methods: ["GET"],
   handler: async (req, context) => {

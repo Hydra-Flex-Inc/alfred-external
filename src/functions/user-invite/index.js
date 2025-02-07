@@ -9,8 +9,9 @@ const { ManagementClient } = require("auth0");
 const config = require("../../../config");
 config.auth0.scope = "read:users create:users"; // add the roles we want to use in this context
 const management = new ManagementClient(config.auth0);
-
 const { v4: uuidv4 } = require("uuid");
+
+// Uses authorization in auth0 queries
 
 /**
  * Look up an Auth0 user in our system

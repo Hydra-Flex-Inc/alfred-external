@@ -6,7 +6,7 @@ const Validator = require("../../../validator");
 const ErrorHandler = require("../../../errorHandler");
 
 const getWashPackages = async (context, req) => {
-  const validator = new Validator(req.query, {
+  const validator = new Validator(req.req_query, {
     gatewayId: "string|required",
   });
 
@@ -29,7 +29,7 @@ const getWashPackages = async (context, req) => {
     LEFT JOIN chemical_containers cc
       ON cc.id = cwp2cc.chemical_container_id
   WHERE
-    cwp.iot_hub_device_id = '${req.query.gatewayId}'
+    cwp.iot_hub_device_id = '${req.req_query.gatewayId}'
     AND cwp.deleted_at IS NULL
     AND cwp2cc.deleted_at IS NULL
     AND cc.deleted_at IS NULL
@@ -249,6 +249,42 @@ const deleteWashPackage = async (context, req) => {
   return null;
 };
 
+const executeFunctionLogic = async (req, context) => {
+  try {
+    // Simple switch to call the correct handling function for all accepted methods
+    let out = null;
+
+    switch (req.method) {
+      case "GET":
+        out = await getWashPackages(context, req);
+        break;
+
+      case "POST":
+        out = await createWashPackage(context, req);
+        break;
+
+      case "PUT":
+        out = await updateWashPackage(context, req);
+        break;
+
+      case "DELETE":
+        out = await deleteWashPackage(context, req);
+        break;
+
+      default:
+        // This should not happen as Azure APIM protects against this, but as a failsafe
+        // eslint-disable-next-line no-case-declarations
+        const error = new Error("Method does not exist");
+        error.status = 404;
+        throw error;
+    }
+
+    return out;
+  } catch (error) {
+    return ErrorHandler.prepareResponse(context, error);
+  }
+};
+
 app.http("wash-package", {
   methods: ["GET", "POST", "PUT", "DELETE"],
   handler: async (req, context) => {
@@ -260,33 +296,27 @@ app.http("wash-package", {
         requireBusinessId: true,
       });
 
-      // Simple switch to call the correct handling function for all accepted methods
-      let out = null;
+      const out = await executeFunctionLogic(req, context);
 
-      switch (req.method) {
-        case "GET":
-          out = await getWashPackages(context, req);
-          break;
+      return {
+        body: JSON.stringify(out),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+    } catch (error) {
+      return ErrorHandler.prepareResponse(context, error);
+    }
+  },
+});
 
-        case "POST":
-          out = await createWashPackage(context, req);
-          break;
+app.http("wash-package-data", {
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  handler: async (req, context) => {
+    try {
+      req = Common.parseRequest(req);
 
-        case "PUT":
-          out = await updateWashPackage(context, req);
-          break;
-
-        case "DELETE":
-          out = await deleteWashPackage(context, req);
-          break;
-
-        default:
-          // This should not happen as Azure APIM protects against this, but as a failsafe
-          // eslint-disable-next-line no-case-declarations
-          const error = new Error("Method does not exist");
-          error.status = 404;
-          throw error;
-      }
+      const out = await executeFunctionLogic(req, context);
 
       return {
         body: JSON.stringify(out),

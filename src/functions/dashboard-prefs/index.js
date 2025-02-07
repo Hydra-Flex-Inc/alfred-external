@@ -4,6 +4,8 @@ const ErrorHandler = require("../../../errorHandler");
 const Auth = require("../../../auth");
 const Common = require("../../../common");
 
+// Uses the user id to query dashboard preferences.
+
 app.http("dashboard-prefs", {
   methods: ["GET", "POST"],
   handler: async (req, context) => {
