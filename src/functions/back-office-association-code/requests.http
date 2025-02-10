@@ -39,7 +39,6 @@ Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
 
 POST http://localhost:7071/api/back-office-association-code-data
 content-type: application/json
-Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
 
 {
     "location_id": "df557bad-c51f-40a6-cb54-73aa3bdf6f98"

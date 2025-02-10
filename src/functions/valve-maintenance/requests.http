@@ -10,7 +10,6 @@ Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
 ### No auth Call
 POST http://localhost:7071/api/valve-maintenance-data
 content-type: application/json
-Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
 
 {
   "maintenanceId": "09c94ed5-7e24-40ab-96b7-a686e6c8f3f6",
