@@ -7,6 +7,9 @@ const Validator = require("../../../validator");
 const ErrorHandler = require("../../../errorHandler");
 const Common = require("../../../common");
 
+// Uses the authorized user business id to query businesses.
+// Will we be keeping track of wash packages?
+
 app.http("back-office-wash-package-sales", {
   methods: ["GET"],
   handler: async (req, context) => {
@@ -18,7 +21,7 @@ app.http("back-office-wash-package-sales", {
         requireBusinessId: true,
       });
 
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         lid: "required|uuid",
         start: "required|iso8601",
         end: "required|iso8601",
@@ -30,7 +33,7 @@ app.http("back-office-wash-package-sales", {
       }
 
       // Extract parameters from the request query string
-      const { start, end, dateFormat } = req.query;
+      const { start, end, dateFormat } = req.req_query;
 
       if (start >= end) {
         // string compare is fine for this
@@ -98,7 +101,7 @@ app.http("back-office-wash-package-sales", {
       FROM locations
       WHERE id = $1
     `,
-        [req.query.lid]
+        [req.req_query.lid]
       );
       // context.log('Location query:', locationQuery.rows);
       if (locationQuery.rowCount === 0) {

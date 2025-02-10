@@ -1,5 +1,4 @@
 ### Simple, should limit at two hours' worth or data
-
 GET http://localhost:7071/api/gateway-status
     ?deviceId=advm2-sensor-trial
 content-type: application/json
@@ -37,3 +36,8 @@ GET http://localhost:7071/api/gateway-status
 content-type: application/json
 Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
 
+### No auth call, should limit at two hours' worth or data
+GET http://localhost:7071/api/gateway-status-data
+    ?deviceId=advm2-sensor-trial
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3

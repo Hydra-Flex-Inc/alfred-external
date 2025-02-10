@@ -5,6 +5,54 @@ const Validator = require("../../../validator");
 const Auth = require("../../../auth");
 const ErrorHandler = require("../../../errorHandler");
 
+const executeFunctionLogic = async (body, context) => {
+  try {
+    // prepare params
+    const params = [];
+    const updates = [];
+
+    // List of fields that are allowed to be changed by this API call.
+    const mutableFields = [
+      "display_name",
+      "city",
+      "region",
+      "postal_code",
+      "description",
+      "coordinates",
+      "address",
+      "phone",
+      "water_cost_per_gallon",
+      "currency_code",
+    ];
+
+    mutableFields.forEach((field) => {
+      if (body[field] !== undefined) {
+        params.push(body[field]);
+        updates.push(`${field} = $${params.length}`);
+      }
+    });
+
+    // Only proceed if we found a field to update in the request body.
+    if (updates.length) {
+      params.push(body.id); // Add the ID for the where condition.
+
+      // Save the updates to the component.
+      const query = `
+      UPDATE locations
+        SET ${updates.join(", ")}
+        WHERE locations.id = $${params.length}
+    `;
+
+      await db.query(query, params);
+    }
+
+    // echo the passed in request if saved successfully.
+    return body;
+  } catch (error) {
+    return ErrorHandler.prepareResponse(context, error);
+  }
+};
+
 app.http("location", {
   methods: ["POST"],
   handler: async (req, context) => {
@@ -41,48 +89,50 @@ app.http("location", {
       // Ensure that the authorized user is allowed to update this particular location
       await Auth.canAccessLocation(body.id, authorizedUser, db);
 
-      // prepare params
-      const params = [];
-      const updates = [];
+      const out = await executeFunctionLogic(body, context);
 
-      // List of fields that are allowed to be changed by this API call.
-      const mutableFields = [
-        "display_name",
-        "city",
-        "region",
-        "postal_code",
-        "description",
-        "coordinates",
-        "address",
-        "phone",
-        "water_cost_per_gallon",
-        "currency_code",
-      ];
+      return {
+        body: JSON.stringify(out),
+        headers: { "Content-Type": "application/json" },
+      };
+    } catch (error) {
+      return ErrorHandler.prepareResponse(context, error);
+    }
+  },
+});
 
-      mutableFields.forEach((field) => {
-        if (body[field] !== undefined) {
-          params.push(body[field]);
-          updates.push(`${field} = $${params.length}`);
-        }
+app.http("location-data", {
+  methods: ["POST"],
+  handler: async (req, context) => {
+    try {
+      req = Common.parseRequest(req);
+
+      const body = await req.json();
+
+      // Validate input
+      // TODO a couple of these could be made a bit more strict.
+      const validator = new Validator(body, {
+        id: "required|uuid",
+        display_name: "required|freeflow",
+        address: "freeflow",
+        city: "freeflow",
+        region: "freeflow",
+        postal_code: "freeflow",
+        phone: "freeflow",
+        description: "freeflow",
+        coordinates: "freeflow",
+        water_cost_per_gallon: "numeric",
+        currency_code: "regex:/^[A-Z]{3}$/", // ISO 4217 currency code
       });
 
-      // Only proceed if we found a field to update in the request body.
-      if (updates.length) {
-        params.push(body.id); // Add the ID for the where condition.
-
-        // Save the updates to the component.
-        const query = `
-        UPDATE locations
-          SET ${updates.join(", ")}
-          WHERE locations.id = $${params.length}
-      `;
-
-        await db.query(query, params);
+      if (validator.fails()) {
+        throw validator.errors;
       }
 
-      // echo the passed in request if saved successfully.
+      const out = await executeFunctionLogic(body, context);
+
       return {
-        body: JSON.stringify(body),
+        body: JSON.stringify(out),
         headers: { "Content-Type": "application/json" },
       };
     } catch (error) {

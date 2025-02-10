@@ -10,6 +10,8 @@ const Common = require("../../../common");
 config.auth0.scope = "update:users";
 const management = new ManagementClient(config.auth0);
 
+// Uses user_id and auth0_id
+
 app.http("profile-picture", {
   methods: ["POST", "DELETE"],
   handler: async (req, context) => {

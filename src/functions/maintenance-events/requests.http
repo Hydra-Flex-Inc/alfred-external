@@ -16,3 +16,9 @@ GET http://localhost:7071/api/maintenance-events
 content-type: application/json
 Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
 
+
+### No auth call. Uses gateway_id
+GET http://localhost:7071/api/maintenance-events-data
+    ?gateway_id=advm2-sensor-trial
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3

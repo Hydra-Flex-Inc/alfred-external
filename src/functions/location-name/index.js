@@ -20,7 +20,7 @@ const getLocationNameData = async (req, context) => {
       LEFT JOIN gateways g
         ON l.id = g.location_id
     WHERE
-      g.iot_hub_device_id = '${req.query.gatewayId}'
+      g.iot_hub_device_id = '${req.req_query.gatewayId}'
   `;
     const result = await db.query(query);
     const location = result?.rows[0] || {};
@@ -30,7 +30,7 @@ const getLocationNameData = async (req, context) => {
         carWashName += ` @ ${location.city}, ${location.region}`;
       }
     } else {
-      carWashName += ` (${req.query.gatewayId})`;
+      carWashName += ` (${req.req_query.gatewayId})`;
     }
     return {
       body: carWashName,
@@ -53,7 +53,7 @@ app.http("location-name", {
         requireBusinessId: true,
       });
 
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         gatewayId: "required|string",
       });
 
@@ -80,7 +80,7 @@ app.http("location-name-data", {
     try {
       req = Common.parseRequest(req);
 
-      const validator = new Validator(req.query, {
+      const validator = new Validator(req.req_query, {
         gatewayId: "required|string",
       });
 

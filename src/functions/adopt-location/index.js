@@ -5,6 +5,8 @@ const Validator = require("../../../validator");
 const Auth = require("../../../auth");
 const ErrorHandler = require("../../../errorHandler");
 
+// Business and location logic will be handled by Quivio, so this might just turn into a code redemption function.
+
 app.http("adopt-location", {
   methods: ["POST"],
   handler: async (req, context) => {

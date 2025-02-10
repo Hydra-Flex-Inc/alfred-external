@@ -2,10 +2,10 @@
 
 POST http://localhost:7071/api/back-office-association-code
 content-type: application/json
-Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
+Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
 
 {
-    "location_id": "d8c315a6-2288-3eee-4c2c-4773a46b782e"
+    "location_id": "df557bad-c51f-40a6-cb54-73aa3bdf6f98"
 }
 
 ### Bad request: Invalid location_id
@@ -33,4 +33,14 @@ Cookie: HFI_ALFRED_AUTH_TOKEN=87d38ab6-bd8a-4dca-89b7-87e750b2c9a0
 
 {
     "location_id": "afc0ef89-119a-409e-9c02-a7a048786062"
+}
+
+### No auth request
+
+POST http://localhost:7071/api/back-office-association-code-data
+content-type: application/json
+Cookie: HFI_ALFRED_AUTH_TOKEN=2bcbc3b0-4ddd-4ad8-b6b9-ac5e01a08b5b
+
+{
+    "location_id": "df557bad-c51f-40a6-cb54-73aa3bdf6f98"
 }
