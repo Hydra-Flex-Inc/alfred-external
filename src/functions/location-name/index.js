@@ -32,12 +32,7 @@ const getLocationNameData = async (req, context) => {
     } else {
       carWashName += ` (${req.req_query.gatewayId})`;
     }
-    return {
-      body: carWashName,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
+    return carWashName;
   } catch (error) {
     return ErrorHandler.prepareResponse(context, error);
   }
