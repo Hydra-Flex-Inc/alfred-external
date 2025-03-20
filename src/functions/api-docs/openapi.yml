@@ -123,6 +123,8 @@ components:
               type: string
             coordinates:
               type: string
+            gateway_id: 
+              type: string
             code_used_on_date:
               type: string
               format: date-time
