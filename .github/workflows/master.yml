@@ -1,4 +1,4 @@
-name: Merge Staging to Master and Master to Develop
+name: Merge Master into Develop
 
 on:
   pull_request:
