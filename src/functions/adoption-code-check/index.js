@@ -27,12 +27,15 @@ SELECT
   l.phone,
   l.description,
   l.coordinates,
+  g.iot_hub_device_id as gateway_id,
   lac.used_on_date as code_used_on_date,
   lac.valid_thru as code_valid_thru
 FROM
   locations l
   LEFT JOIN location_adoption_codes lac
     ON l.id = lac.location_id
+  LEFT JOIN gateways g
+    ON l.id = g.location_id
 WHERE ${predicates.join(" AND ")}
 `;
     const result = await db.query(query, params);
