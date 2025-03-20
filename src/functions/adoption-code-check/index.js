@@ -67,6 +67,19 @@ WHERE ${predicates.join(" AND ")}
       throw error;
     }
 
+    // Get the gateway id for the location.
+    const gatewayQuery = `
+    SELECT 
+      iot_hub_device_id 
+    FROM 
+      gateways
+    WHERE 
+      location_id = $1`;
+    const gatewayResult = await db.query(gatewayQuery, [location.id]);
+    if(gatewayResult.rowCount > 0) {
+      location.gateway_id = gatewayResult.rows[0].iot_hub_device_id;
+    }
+
     // Combine the results of the 2 queries.
     const out = {
       adoption_code: req.req_query.adoption_code,
