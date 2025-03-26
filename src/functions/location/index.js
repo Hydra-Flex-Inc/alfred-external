@@ -103,6 +103,7 @@ app.http("location", {
 
 app.http("location-data", {
   methods: ["POST"],
+  authLevel: "function",
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);

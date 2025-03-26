@@ -142,6 +142,7 @@ app.http("valve-maintenance", {
 // I will include this as a param for the function, but we should discuss if we want to continue this or do something else.
 app.http("valve-maintenance-data", {
   methods: ["POST"],
+  authLevel: "function",
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);
