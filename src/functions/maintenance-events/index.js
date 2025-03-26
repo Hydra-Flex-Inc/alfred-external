@@ -92,6 +92,7 @@ app.http("maintenance-events", {
 // get maintenance events using gateway_id
 app.http("maintenance-events-data", {
   methods: ["GET"],
+  authLevel: "function",
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);

@@ -95,6 +95,7 @@ app.http("location-components", {
 // Uses gateway id to retrieve components
 app.http("location-components-data", {
   methods: ["GET"],
+  authLevel: "function",
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);

@@ -82,6 +82,7 @@ app.http("component", {
 
 app.http("component-data", {
   methods: ["POST"],
+  authLevel: "function",
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);

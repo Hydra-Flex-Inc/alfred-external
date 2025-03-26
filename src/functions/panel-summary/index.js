@@ -154,6 +154,7 @@ app.http("panel-summary", {
 
 app.http("panel-summary-data", {
   methods: ["GET"],
+  authLevel: "function",
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);

@@ -159,6 +159,7 @@ For now I will keep those fields and just assign them the same value.
 
 app.http("system-alert-summary-data", {
   methods: ["GET"],
+  authLevel: "function",
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);

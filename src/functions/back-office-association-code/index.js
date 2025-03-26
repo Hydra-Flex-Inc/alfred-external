@@ -125,6 +125,7 @@ app.http("back-office-association-code", {
 
 app.http("back-office-association-code-data", {
   methods: ["POST"],
+  authLevel: "function",
   handler: async (req, context) => {
     try {
       req = await Common.parseRequest(req);
