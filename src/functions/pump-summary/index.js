@@ -139,6 +139,7 @@ app.http("pump-summary", {
 
 app.http("pump-summary-data", {
   methods: ["GET"],
+  authLevel: "function",
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);

@@ -44,6 +44,7 @@ app.http("chemical-list", {
 
 app.http("chemical-list-data", {
   methods: ["GET"],
+  authLevel: "function",
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);

@@ -115,6 +115,7 @@ app.http("adoption-code-check", {
 
 app.http("adoption-code-check-data", {
   methods: ["GET"],
+  authLevel: "function",
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);

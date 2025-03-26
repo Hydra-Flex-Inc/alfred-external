@@ -218,6 +218,7 @@ app.http("flow-sense-gpm", {
 
 app.http("flow-sense-gpm-data", {
   methods: ["GET"],
+  authLevel: "function",
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);
