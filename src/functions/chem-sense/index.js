@@ -636,6 +636,7 @@ app.http("chem-sense", {
 
 app.http("chem-sense-data", {
   methods: ["GET"],
+  authLevel: "function",
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);

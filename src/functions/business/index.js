@@ -85,6 +85,7 @@ app.http("business", {
 
 app.http("business-data", {
   methods: ["POST"],
+  authLevel: "function",
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);

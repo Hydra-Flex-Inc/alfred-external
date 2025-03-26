@@ -312,6 +312,7 @@ app.http("wash-package", {
 
 app.http("wash-package-data", {
   methods: ["GET", "POST", "PUT", "DELETE"],
+  authLevel: "function",
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);
