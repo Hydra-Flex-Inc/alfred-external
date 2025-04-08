@@ -17,10 +17,10 @@ info:
     * One in TimescaleDB containing the time series data from the IoT Hub
   version: 2.0.0
 servers:
-  - url: https://alfred-api.hydraflexinc.com/alfred
-    description: "Production server"
   - url: http://localhost:7071/api
     description: "Development server"
+  - url: https://alfred-api.hydraflexinc.com/alfred-v2
+    description: "Production server"
 
 components:
   securitySchemes:
@@ -87,79 +87,207 @@ components:
           type: string
         message:
           type: string
-    LocationHours:
+    BusinessResponse:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    AdoptionCodeResponse:
+      type: object
+      properties:
+        adoption_code:
+          type: string
+        location:
+          type: object
+          properties:
+            id:
+              type: string
+            business_id:
+              type: string
+            name:
+              type: string
+            address:
+              type: string
+            city:
+              type: string
+            region:
+              type: string
+            postal_code:
+              type: string
+            phone:
+              type: string
+            description:
+              type: string
+            coordinates:
+              type: string
+            code_used_on_date:
+              type: string
+              format: date-time
+            code_valid_thru:
+              type: string
+              format: date-time
+    BackOfficeAssoicationCodeResponse:
+      type: object
+      properties:
+        association_code:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
         location_id:
           type: string
           format: uuid
-          description: The unique identifier of a location.
-        hours:
-          type: array
-          description: >
-            Array of 7 entries – one per day (Monday [1] to Sunday [7] – each entry must either specify valid open/close times or be marked as closed.
-          minItems: 7
-          maxItems: 7
-          items:
-            type: object
-            properties:
-              day:
-                type: integer
-                minimum: 1
-                maximum: 7
-                description: The day of the week (1 = Monday, 7 = Sunday).
-              open:
-                type: string
-                pattern: '^([0-1]\d|2[0-3]):([0-5]\d)$'
-                nullable: true
-                description: Opening time in HH:MM format.
-              close:
-                type: string
-                pattern: '^([0-1]\d|2[0-3]):([0-5]\d)$'
-                nullable: true
-                description: Closing time in HH:MM format.
-              closed:
-                type: boolean
-                default: false
-                description: Indicates if the location is closed on that day.
-            required:
-              - day
-    WashSummary:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            type: object
-            properties:
-              date:
-                type: string
-                format: date-time
-              wash_count:
-                type: integer
-              wash_total_value:
-                type: number
-                format: float
-    WashPackageListItem:
-      type: object
-      properties:
-        sku:
+        business_id:
           type: string
+          format: uui
+    Widget:
+      type: object
+      properties:
+        widgetId:
+          type: integer
+        label:
+          description: Actual text that will be presented as the widget header
+          type: string
+        column:
+          description: Column number in the dashboard. Since mobile has only one column, mobile should always be `1`
+          type: integer
+        position:
+          type: integer
+        type:
+          type: string
+          enum: [GRAPH, LIST, TABLE, KPI]
+        timeFilter:
+          description: Time filter for the widget. If CUSTOM, `customDateTime` field is required
+          type: string
+          enum: [TODAY, YESTERDAY, WEEK, MONTH, QUARTER, ALLTIME, CUSTOM]
+        customDateTime:
+          $ref: "#/components/schemas/CustomDateTime"
+        widgetConfig:
+          type: object
+          properties:
+            washPackageId:
+              description: Required when category is WASHPACKAGE. Must be the wash package UUID from the Alfred system
+              type: string
+              pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+            chemicalContainerId:
+              description: Required when category is CHEMSENSE. Must be the chemical container UUID from the Alfred system
+              type: string
+              pattern: "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+        category:
+          type: string
+          enum: [FLOWSENSE, CHEMSENSE, WASHPACKAGE, AQUALAB3]
+      required: [widgetId, column, position, type, timeFilter, category]
+    CustomDateTime:
+      type: object
+      properties:
+        startDate:
+          description: ISO8601 date-time format. Required when timeFilter is CUSTOM
+          type: string
+          format: date-time
+        endDate:
+          description: ISO8601 date-time format. Required when timeFilter is CUSTOM
+          type: string
+          format: date-time
+      required: [startDate, endDate]
+    WashPackage:
+      type: object
+      properties:
         id:
           type: string
         name:
           type: string
-        departmentName:
-          type: string
-        priceAtSite:
-          type: string
-        isPromptForPrice:
-          type: boolean
-        siteId:
+        package_level:
           type: integer
+        color_code:
+          type: string
         a_la_carte:
           type: boolean
-
+        container_ids:
+          type: array
+          items:
+            type: string
+        back_office_wash_package_id:
+          type: string
+    WashPackageInput:
+      type: object
+      properties:
+        gatewayId:
+          type: string
+        washPackageName:
+          type: string
+        washPackageLevel:
+          type: integer
+        aLaCarte:
+          type: boolean
+        chemicalIds:
+          type: array
+          items:
+            type: string
+        backOfficeWashPackageId:
+          type: string
+      required:
+        - gatewayId
+    Container:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        container_type:
+          type: string
+        characteristics:
+          type: object
+          properties:
+            mmInputMin:
+              type: number
+            mmPerGal:
+              type: number
+            containerGals:
+              type: number
+            refillGals:
+              type: number
+        mmLatestReading:
+          type: number
+        pctLatestReading:
+          type: number
+        galLatestReading:
+          type: number
+        costPerMilliliter:
+          type: number
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+        washPackages:
+          type: array
+          items:
+            type: string
+        levelTrend:
+          type: array
+          items:
+            type: object
+            properties:
+              time:
+                type: string
+                format: date-time
+              value:
+                type: number
+        mmUsed:
+          type: number
+        gallonsUsed:
+          type: number
+        mmFilled:
+          type: number
+        gallonsFilled:
+          type: number
+        refillUnits:
+          type: number
   responses:
     ErrorResponse400:
       description: "Bad Request"
@@ -191,6 +319,377 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ErrorProperties"
+    TotalValveCyclesResponse:
+      description: Total valve cycles retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                modbusId:
+                  type: integer
+                v1:
+                  type: integer
+                v2:
+                  type: integer
+                v3:
+                  type: integer
+                v4:
+                  type: integer
+                v5:
+                  type: integer
+                v6:
+                  type: integer
+                v7:
+                  type: integer
+    PumpStatusResponse:
+      description: Pump status retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                unixtime:
+                  type: integer
+                time:
+                  type: string
+                  format: date-time
+                deviceId:
+                  type: string
+                modbusId:
+                  type: string
+                rpm:
+                  type: number
+                  format: float
+                amps:
+                  type: number
+                  format: float
+                watts:
+                  type: number
+                  format: float
+                freqConvTemp:
+                  type: number
+                  format: float
+                electronicsTemp:
+                  type: number
+                  format: float
+                outletPressure:
+                  type: number
+                  format: float
+                frequency:
+                  type: number
+                  format: float
+    PumpSummaryResponse:
+      description: Pump summary retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                unixtime:
+                  type: integer
+                time:
+                  type: string
+                  format: date-time
+                deviceId:
+                  type: string
+                modbusId:
+                  type: string
+                relativePerformance:
+                  type: number
+                  format: float
+                  description: Relative performance of the pump. Averaged when timebucketed.
+                actualSetpoint:
+                  type: number
+                  format: float
+                  description: Actual setpoint of the pump. Averaged when timebucketed.
+                userSetpoint:
+                  type: number
+                  format: float
+                  description: User setpoint of the pump. Averaged when timebucketed.
+                maxFlowLimit:
+                  type: number
+                  format: float
+                  description: Maximum flow limit of the pump. Averaged when timebucketed.
+                dcVoltage:
+                  type: number
+                  format: float
+                  description: DC voltage of the pump. Averaged when timebucketed.
+                runTime:
+                  type: integer
+                  description: Run time of the pump. MAX value when timebucketed.
+                onTime:
+                  type: integer
+                  description: On time of the pump. MAX value when timebucketed.
+                totalKWH:
+                  type: number
+                  format: float
+                  description: Total KWH of the pump. Max value when timebucketed.
+                starts:
+                  type: integer
+    SensorDataResponse:
+      description: Sensor data retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                gateway_id:
+                  type: string
+                  format: alpha_dash
+                device_id:
+                  type: string
+                sensor_data:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      time:
+                        type: string
+                        format: date-time
+                      value:
+                        type: integer
+                name:
+                  type: string
+                container_size_gals:
+                  type: string
+    LocationComponentsResponse:
+      description: Components retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              iot_hub_device_id:
+                type: string
+              components:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    modbus_id:
+                      type: string
+                    position:
+                      type: integer
+                    type:
+                      type: string
+                    name:
+                      type: string
+    LocationResponse:
+      description: Location updated successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              display_name:
+                type: string
+              address:
+                type: string
+              city:
+                type: string
+              region:
+                type: string
+              postal_code:
+                type: string
+              phone:
+                type: string
+              description:
+                type: string
+              coordinates:
+                type: string
+              water_cost_per_gallon:
+                type: number
+                format: float
+                description: The water cost per gallon, expected to be a number with two digits after the decimal point.
+              currency_code:
+                type: number
+                pattern: "^[A-Z0-9]{3}$"
+                description: ISO 4217 currency code
+    FlowSenseGPMResponse:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                time:
+                  type: string
+                  format: date-time
+                device_id:
+                  type: string
+                type:
+                  type: string
+                  enum: ["main_pulse", "reclaim_pulse"]
+                value:
+                  type: number
+    SystemAlertSummaryResponse:
+      description: System alert summary retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              alerts:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    location_id:
+                      type: string
+                    component_id:
+                      type: string
+                    component_name:
+                      type: string
+                    component_type:
+                      type: string
+              totalCount:
+                type: integer
+              locationCount:
+                type: integer
+    ValveMaintenanceResponse:
+      description: Maintenance event updated successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                completed_at:
+                  type: string
+                  format: date-time
+                completing_user_id:
+                  type: string
+                  format: uuid
+    LocationHoursResponse:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                day:
+                  type: integer
+                  format: int32
+                  description: The day of the week (1-7), Monday being 1
+                open:
+                  type: string
+                  description: The opening time in HH:MM format
+                close:
+                  type: string
+                  description: The closing time in HH:MM format
+                closed:
+                  type: boolean
+                  description: True if the location is closed for this entire day
+    MaintenanceEventsResponse:
+      description: Maintenance events retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                event_type:
+                  type: string
+                location_id:
+                  type: string
+                  format: uuid
+                component_id:
+                  type: string
+                  format: uuid
+                component_name:
+                  type: string
+                component_type:
+                  type: string
+    PanelSummaryResponse:
+      description: Panel summary retrieved successfully
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                unixtime:
+                  type: integer
+                time:
+                  type: string
+                  format: date-time
+                deviceId:
+                  type: string
+                modbusId:
+                  type: string
+                humidity:
+                  type: number
+                  format: float
+                tempF:
+                  type: number
+                  format: float
+                v1cycles:
+                  type: integer
+                v2cycles:
+                  type: integer
+                v3cycles:
+                  type: integer
+                v4cycles:
+                  type: integer
+                v5cycles:
+                  type: integer
+                v6cycles:
+                  type: integer
+                v7cycles:
+                  type: integer
+                v1secs:
+                  type: number
+                  format: float
+                v2secs:
+                  type: number
+                  format: float
+                v3secs:
+                  type: number
+                  format: float
+                v4secs:
+                  type: number
+                  format: float
+                v5secs:
+                  type: number
+                  format: float
+                v6secs:
+                  type: number
+                  format: float
+                v7secs:
+                  type: number
+                  format: float
+                elapsedSecs:
+                  type: number
+                  format: float
 
 security:
   - cookieAuth: []
@@ -265,58 +764,198 @@ paths:
           $ref: "#/components/responses/ErrorResponse404"
         "500":
           $ref: "#/components/responses/ErrorResponse500"
-  /location-hours:
+  /adopt-location:
     post:
-      summary: Update location hours
-      description: >
-        Updates a location's operating hours.
-        The hours array must contain an entry for each day of the week.
-        If an entry indicates the location is closed (closed=true), then open and close times should be null.
+      summary: Adopt a location for a user
+      operationId: adoptLocation
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LocationHours"
+              type: object
+              properties:
+                business_name:
+                  type: string
+                location_name:
+                  type: string
+                adoption_code:
+                  type: string
       responses:
         "200":
-          description: Location hours updated successfully.
+          description: Location adopted successfully
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                    example: true
+                  adoption_code:
+                    type: string
+                  location:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      business_id:
+                        type: string
+                      name:
+                        type: string
+                      address:
+                        type: string
+                      city:
+                        type: string
+                      region:
+                        type: string
+                      postal_code:
+                        type: string
+                      description:
+                        type: string
+                      coordinates:
+                        type: string
+                      code_used_on_date:
+                        type: string
+                      code_valid_thru:
+                        type: string
+                  business:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
         "400":
           $ref: "#/components/responses/ErrorResponse400"
         "401":
           $ref: "#/components/responses/ErrorResponse401"
         "403":
           $ref: "#/components/responses/ErrorResponse403"
-        "404":
-          $ref: "#/components/responses/ErrorResponse404"
         "500":
           $ref: "#/components/responses/ErrorResponse500"
-
-  /location-hours-data:
+  /adoption-code-check:
+    get:
+      summary: Check the validity of an adoption code
+      parameters:
+        - name: adoption_code
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: "^[a-zA-Z0-9]+$"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdoptionCodeResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /adoption-code-check-data:
+    get:
+      summary: (No auth required) Check the validity of an adoption code. No authorization required.
+      parameters:
+        - name: adoption_code
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: "^[a-zA-Z0-9]+$"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdoptionCodeResponse"
+        "400":
+          description: Validation error or adoption code issue
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  # MARK: /back-office-association-code
+  /back-office-association-code:
     post:
-      summary: Update location hours (no auth required)
-      description: >
-        Updates a location's operating hours without authentication requirements.
-        The hours array must contain an entry for each day of the week.
-        If an entry indicates the location is closed (closed=true), then open and close times should be null.
-      security: []
+      summary: Retrieve Back Office association code
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/LocationHours"
+              type: object
+              properties:
+                location_id:
+                  type: string
+                  format: uuid
       responses:
         "200":
-          description: Location hours updated successfully.
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BackOfficeAssoicationCodeResponse"
+        "400":
+          description: Invalid location_id or location is not associated with a business
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /back-office-association-code-data:
+    post:
+      operationId: backOfficeAssociationCodeData
+      summary: (No auth required) Retrieve Back Office association code with checking authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                location_id:
+                  type: string
+                  format: uuid
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BackOfficeAssoicationCodeResponse"
+        "400":
+          description: Invalid location_id or location is not associated with a business
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /back-office-wash-package-list:
+    get:
+      summary: Retrieve wash package list from Back Office
+      parameters:
+        - name: lid
+          description: Location ID (UUID)
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
           content:
             application/json:
               schema:
@@ -324,66 +963,1277 @@ paths:
                 items:
                   type: object
                   properties:
-                    day:
-                      type: integer
-                      description: The day of the week (1-7), Monday being 1
-                    open:
+                    sku:
                       type: string
-                      description: The opening time in HH:MM format
-                    close:
+                    id:
                       type: string
-                      description: The closing time in HH:MM format
-                    closed:
+                    name:
+                      type: string
+                    departmentName:
+                      type: string
+                    priceAtSite:
+                      type: string
+                    isPromptForPrice:
                       type: boolean
-                      description: True if the location is closed for this entire day
+                    siteId:
+                      type: integer
+                    a_la_carte:
+                      type: boolean
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /back-office-wash-package-sales:
+    get:
+      summary: Gets the wash packe sales summary from Back Office
+      parameters:
+        - name: lid
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: start
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: dateFormat
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [month, day, hour]
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalCostPerPackageResults:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        price:
+                          type: number
+                          format: float
+                        totalSales:
+                          type: number
+                          format: float
+                  start:
+                    type: string
+                    format: date-time
+                  end:
+                    type: string
+                    format: date-time
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          $ref: "#/components/responses/ErrorResponse404"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /business:
+    post:
+      summary: Update a business
+      operationId: updateBusiness
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  description: ID of the business to update
+                name:
+                  type: string
+                  description: New name of the business
+      responses:
+        "200":
+          description: Business updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /business-data:
+    post:
+      summary: (No auth required) Update a business without checking authorization
+      operationId: updateBusinessNoAuth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  description: ID of the business to update
+                name:
+                  type: string
+                  description: New name of the business
+      responses:
+        "200":
+          description: Business updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /chem-sense:
+    get:
+      summary: Retrieve chemical sensor data
+      parameters:
+        - name: gatewayId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: start
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  containers:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Container"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /chem-sense-data:
+    get:
+      operationId: getChemSenseData
+      summary: (No auth required) Retrieve chemical sensor data. No authorization required.
+      parameters:
+        - name: gatewayId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: start
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  containers:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Container"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /chemical-containers:
+    get:
+      summary: Get chemical container data
+      description: Retrieve data for chemical containers.
+      parameters:
+        - name: gatewayId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChemicalContainer"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /chemical-containers-data:
+    get:
+      operationId: getChemicalContainersData
+      summary: (No auth required) Get chemical container data
+      description: Retrieve data for chemical containers.
+      parameters:
+        - name: gatewayId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChemicalContainer"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /chemical-list:
+    get:
+      summary: Retrieve a list of chemicals
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    vendor:
+                      type: string
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /chemical-list-data:
+    get:
+      operationId: getChemicalListData
+      summary: (No auth required) Retrieve a list of chemicals
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    vendor:
+                      type: string
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /component:
+    post:
+      summary: Update a component
+      operationId: updateComponent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  description: ID of the component to update
+                name:
+                  type: string
+                  description: New name of the component
+      responses:
+        "200":
+          description: Component updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  name:
+                    type: string
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /component-data:
+    post:
+      summary: Update a component
+      operationId: updateComponentData
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  description: ID of the component to update
+                gateway_id:
+                  type: string
+                  format: alpha_dash
+                  description: ID of the gateway
+                name:
+                  type: string
+                  description: New name of the component
+              required:
+                - id
+                - name
+                - device_id
+      responses:
+        "200":
+          description: Component updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  gateway_id:
+                    type: string
+                    format: alpha_dash
+                  name:
+                    type: string
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+              examples:
+                validationError:
+                  summary: Validation Error
+                  value:
+                    code: 400
+                    message: A field is not valid.
+                noDuplicateNames:
+                  summary: No duplicate names
+                  value:
+                    code: "400"
+                    message: "Each component must have a unique name."
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /dashboard-prefs:
+    get:
+      summary: Get dashboard preferences
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  desktop_json:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Widget"
+                  mobile_json:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Widget"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          description: No preferences found for the user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+    post:
+      summary: Set dashboard preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                desktop_json:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Widget"
+                mobile_json:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Widget"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  desktop_json:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Widget"
+                  mobile_json:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Widget"
+        "400":
+          description: Either desktop_json or mobile_json is required and must be a valid JSON object
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /edit-chemical-container:
+    post:
+      summary: Edit a chemical container
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                containerId:
+                  type: string
+                  format: uuid
+                chemicalName:
+                  type: string
+                customName:
+                  type: string
+                container:
+                  type: string
+                  enum: ["15", "30", "Bullseye"]
+                valves:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      panel:
+                        type: integer
+                      valve:
+                        type: integer
+                code:
+                  type: string
+                  format: email
+                gatewayId:
+                  type: string
+                container_cost:
+                  type: number
+                currency_code:
+                  type: string
+              required:
+                - containerId
+                - chemicalName
+                - customName
+                - container
+                - gatewayId
+                - container_cost
+                - currency_code
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /edit-chemical-container-data:
+    post:
+      operationId: editChemicalContainerData
+      summary: (No auth required) Edit a chemical container
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                containerId:
+                  type: string
+                  format: uuid
+                chemicalName:
+                  type: string
+                customName:
+                  type: string
+                container:
+                  type: string
+                  enum: ["15", "30", "Bullseye"]
+                valves:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      panel:
+                        type: integer
+                      valve:
+                        type: integer
+                code:
+                  type: string
+                  format: email
+                gatewayId:
+                  type: string
+                container_cost:
+                  type: number
+                currency_code:
+                  type: string
+              required:
+                - containerId
+                - chemicalName
+                - customName
+                - container
+                - gatewayId
+                - container_cost
+                - currency_code
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /flow-sense-gpm:
+    description: >
+      Data is stored in the database once per minute. Leaving off the `bucketMinutes`
+      parameter will return the raw data. If you want to aggregate the data, include
+      `bucketMinutes` and you will get the average gpm for the specified time period.
+    get:
+      summary: Retrieve gallons per minute (gpm) for flow on the main and reclaim lines
+      parameters:
+        - in: query
+          name: gatewayId
+          required: true
+          schema:
+            type: string
+          description: The ID of the gateway
+        - in: query
+          name: deviceId
+          description: >
+            The ID of the actual Flow-Sense sensor box. This is mostly for R&D. In production
+            there will only be one per location (car wash).
+          schema:
+            type: string
+        - in: query
+          name: bucketMinutes
+          schema:
+            type: integer
+          description: Optional, to aggregate data
+        - in: query
+          name: start
+          schema:
+            type: string
+            format: date-time
+          description: >
+            The start time in ISO 8601 format. If missing, the default is 14 days ago.
+        - in: query
+          name: end
+          schema:
+            type: string
+            format: date-time
+          description: The end time in ISO 8601 format
+        - in: query
+          name: dev
+          schema:
+            type: boolean
+          description: Development mode flag
+      responses:
+        "200":
+          $ref: "#/components/responses/FlowSenseGPMResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /flow-sense-gpm-data:
+    description: Data is stored in the database once per minute. Leaving off the `bucketMinutes` parameter will return the raw data. If you want to aggregate the data, include `bucketMinutes` and you will get the average gpm for the specified time period.
+    get:
+      operationId: getFlowSenseGPMData
+      summary: (No Auth required) Retrieve gallons per minute (gpm) for flow on the main and reclaim lines
+      parameters:
+        - in: query
+          name: gatewayId
+          required: true
+          schema:
+            type: string
+          description: The ID of the gateway
+        - in: query
+          name: deviceId
+          description: >
+            The ID of the actual Flow-Sense sensor box. This is mostly for R&D. In production
+            there will only be one per location (car wash).
+          schema:
+            type: string
+        - in: query
+          name: bucketMinutes
+          schema:
+            type: integer
+          description: Optional, to aggregate data
+        - in: query
+          name: start
+          schema:
+            type: string
+            format: date-time
+          description: >
+            The start time in ISO 8601 format. If missing, the default is 14 days ago.
+        - in: query
+          name: end
+          schema:
+            type: string
+            format: date-time
+          description: The end time in ISO 8601 format
+        - in: query
+          name: dev
+          schema:
+            type: boolean
+          description: Development mode flag
+      responses:
+        "200":
+          $ref: "#/components/responses/FlowSenseGPMResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /flow-sense-total:
+    description: >
+      Data is stored in the database once per minute so this endpoint requires the 
+      `bucketMinutes` parameter so we know what interval to totalize the flow for.
+    get:
+      summary: Retrieve water flow data
+      parameters:
+        - in: query
+          name: gatewayId
+          required: true
+          schema:
+            type: string
+          description: The ID of the gateway
+        - in: query
+          name: deviceId
+          schema:
+            type: string
+          description: >
+            The ID of the actual Flow-Sense sensor box. This is mostly for R&D. In production
+            there will only be one per location (car wash).
+        - in: query
+          name: bucketMinutes
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: start
+          schema:
+            type: string
+            format: date-time
+          description: >
+            The start time in ISO 8601 format. If missing, the default is 14 days ago.
+        - in: query
+          name: end
+          schema:
+            type: string
+            format: date-time
+          description: The end time in ISO 8601 format
+        - in: query
+          name: dev
+          schema:
+            type: boolean
+          description: Development mode flag
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    time:
+                      type: string
+                      format: date-time
+                    device_id:
+                      type: string
+                    type:
+                      type: string
+                      enum: ["main_pulse", "reclaim_pulse"]
+                    value:
+                      type: number
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /flow-sense-total-data:
+    description: >
+      (No auth required) Data is stored in the database once per minute so this endpoint requires the 
+      `bucketMinutes` parameter so we know what interval to totalize the flow for.
+    get:
+      summary: Retrieve water flow data
+      operationId: getFlowSenseTotalData
+      parameters:
+        - in: query
+          name: gatewayId
+          required: true
+          schema:
+            type: string
+          description: The ID of the gateway
+        - in: query
+          name: deviceId
+          schema:
+            type: string
+          description: >
+            The ID of the actual Flow-Sense sensor box. This is mostly for R&D. In production
+            there will only be one per location (car wash).
+        - in: query
+          name: bucketMinutes
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: start
+          schema:
+            type: string
+            format: date-time
+          description: >
+            The start time in ISO 8601 format. If missing, the default is 14 days ago.
+        - in: query
+          name: end
+          schema:
+            type: string
+            format: date-time
+          description: The end time in ISO 8601 format
+        - in: query
+          name: dev
+          schema:
+            type: boolean
+          description: Development mode flag
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    time:
+                      type: string
+                      format: date-time
+                    device_id:
+                      type: string
+                    type:
+                      type: string
+                      enum: ["main_pulse", "reclaim_pulse"]
+                    value:
+                      type: number
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /gateway-status:
+    get:
+      summary: Retrieve gateway status
+      operationId: getGatewayStatus
+      parameters:
+        - name: deviceId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: since
+          in: query
+          schema:
+            type: integer
+        - name: count
+          description: >
+            Limit the number of returned rows.
+          in: query
+          schema:
+            type: integer
+            default: 10000
+        - name: bucketMinutes
+          description: >
+            The number of minutes to bucket the data. If this is not included, the raw data will be returned.
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Gateway status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    unixtime:
+                      type: integer
+                    time:
+                      type: string
+                      format: date-time
+                    deviceId:
+                      type: string
+                    cpuLoad1:
+                      type: number
+                      format: float
+                      description: CPU load average over the last 1 minute. Averaged when timebucketed.
+                    cpuLoad5:
+                      type: number
+                      format: float
+                      description: CPU load average over the last 5 minutes. Averaged when timebucketed.
+                    cpuLoad15:
+                      type: number
+                      format: float
+                      description: CPU load average over the last 10 minutes. Averaged when timebucketed.
+                    pctMemoryUsed:
+                      type: number
+                      format: float
+                      description: Percentage of memory used. Averaged when timebucketed.
+                    diskSize:
+                      type: integer
+                      description: Total disk size in bytes. Averaged when timebucketed.
+                    diskCapacity:
+                      type: integer
+                      description: Total disk capacity in bytes. Averaged when timebucketed.
+                    uptime:
+                      type: integer
+                      description: Uptime in seconds. Max value when timebucketed.
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /gateway-status-data:
+    get:
+      summary: (No auth required) Retrieve gateway status
+      operationId: getGatewayStatusData
+      parameters:
+        - name: deviceId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: since
+          in: query
+          schema:
+            type: integer
+        - name: count
+          description: >
+            Limit the number of returned rows.
+          in: query
+          schema:
+            type: integer
+            default: 10000
+        - name: bucketMinutes
+          description: >
+            The number of minutes to bucket the data. If this is not included, the raw data will be returned.
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Gateway status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    unixtime:
+                      type: integer
+                    time:
+                      type: string
+                      format: date-time
+                    deviceId:
+                      type: string
+                    cpuLoad1:
+                      type: number
+                      format: float
+                      description: CPU load average over the last 1 minute. Averaged when timebucketed.
+                    cpuLoad5:
+                      type: number
+                      format: float
+                      description: CPU load average over the last 5 minutes. Averaged when timebucketed.
+                    cpuLoad15:
+                      type: number
+                      format: float
+                      description: CPU load average over the last 10 minutes. Averaged when timebucketed.
+                    pctMemoryUsed:
+                      type: number
+                      format: float
+                      description: Percentage of memory used. Averaged when timebucketed.
+                    diskSize:
+                      type: integer
+                      description: Total disk size in bytes. Averaged when timebucketed.
+                    diskCapacity:
+                      type: integer
+                      description: Total disk capacity in bytes. Averaged when timebucketed.
+                    uptime:
+                      type: integer
+                      description: Uptime in seconds. Max value when timebucketed.
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /location:
+    post:
+      summary: Update a location
+      operationId: updateLocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  description: ID of the location to update
+                display_name:
+                  type: string
+                address:
+                  type: string
+                city:
+                  type: string
+                region:
+                  type: string
+                postal_code:
+                  type: string
+                phone:
+                  type: string
+                description:
+                  type: string
+                coordinates:
+                  type: string
+                water_cost_per_gallon:
+                  type: number
+                  format: float
+                  description: The water cost per gallon, expected to be a number with two digits after the decimal point.
+                currency_code:
+                  type: number
+                  pattern: "^[A-Z0-9]{3}$"
+                  description: ISO 4217 currency code
+      responses:
+        "200":
+          $ref: "#/components/responses/LocationResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /location-data:
+    post:
+      summary: (No auth required) Update a location
+      operationId: updateLocationData
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                  description: ID of the location to update
+                display_name:
+                  type: string
+                address:
+                  type: string
+                city:
+                  type: string
+                region:
+                  type: string
+                postal_code:
+                  type: string
+                phone:
+                  type: string
+                description:
+                  type: string
+                coordinates:
+                  type: string
+                water_cost_per_gallon:
+                  type: number
+                  format: float
+                  description: The water cost per gallon, expected to be a number with two digits after the decimal point.
+                currency_code:
+                  type: number
+                  pattern: "^[A-Z0-9]{3}$"
+                  description: ISO 4217 currency code
+      responses:
+        "200":
+          $ref: "#/components/responses/LocationResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /location-components:
+    get:
+      summary: Retrieve components for a location
+      operationId: getLocationComponents
+      parameters:
+        - name: lid
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: ID of the location
+      responses:
+        "200":
+          $ref: "#/components/responses/LocationComponentsResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          $ref: "#/components/responses/ErrorResponse404"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /location-components-data:
+    get:
+      summary: Retrieve components for a location
+      operationId: getLocationComponentsData
+      parameters:
+        - name: gateway_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: alpha_dash
+            description: Gateway ID of the location
+      responses:
+        "200":
+          $ref: "#/components/responses/LocationComponentsResponse"
         "400":
           $ref: "#/components/responses/ErrorResponse400"
         "404":
           $ref: "#/components/responses/ErrorResponse404"
         "500":
           $ref: "#/components/responses/ErrorResponse500"
-
-  /wash-summary:
-    get:
-      summary: Retrieve wash summary
+  /location-hours:
+    post:
+      operationId: updateLocationHours
+      summary: Update location hours
       description: >
-        Retrieves a time-series summary of wash data.
-        Query parameters include the location ID, a start date, an end date, and the desired date grouping (day, week, month).
-      parameters:
-        - in: query
-          name: lid
-          schema:
-            type: string
-            format: uuid
-          required: true
-          description: The unique location ID.
-        - in: query
-          name: start
-          schema:
-            type: string
-            format: date-time
-          required: true
-          description: Start date in ISO 8601 format.
-        - in: query
-          name: end
-          schema:
-            type: string
-            format: date-time
-          required: true
-          description: End date in ISO 8601 format.
-        - in: query
-          name: dateFormat
-          schema:
-            type: string
-            enum: [day, week, month]
-          description: Date grouping format for the wash summary.
+        The `hours` array should contain objects with the following properties:
+        * `day` - The day of the week (1-7), Monday being 1
+        * `open` - The opening time in HH:MM format
+        * `close` - The closing time in HH:MM format
+        * `closed` - A boolean indicating if the location is closed on this day
+          * If the boolean is missing or "falsey", then hours.*.closed is set to false and hours.*.open and hours.*.close are set to null.
+          * If the boolean is "truthy", then hours.*.closed is set to true and the hours.*.open and hours.*.close strings are validated and used as before.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                location_id:
+                  type: string
+                  description: The ID of the location
+                hours:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      day:
+                        type: integer
+                        format: int32
+                        description: The day of the week (1-7), Monday being 1
+                      open:
+                        type: string
+                        description: The opening time in HH:MM format
+                      close:
+                        type: string
+                        description: The closing time in HH:MM format
+                      closed:
+                        type: boolean
+                        description: True if the location is closed for this entire day
       responses:
         "200":
-          description: Wash summary retrieved successfully.
+          $ref: "#/components/responses/LocationHoursResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          $ref: "#/components/responses/ErrorResponse404"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /location-hours-data:
+    post:
+      operationId: updateLocationHoursData
+      summary: (No auth required) Update location hours
+      description: >
+        The `hours` array should contain objects with the following properties:
+        * `day` - The day of the week (1-7), Monday being 1
+        * `open` - The opening time in HH:MM format
+        * `close` - The closing time in HH:MM format
+        * `closed` - A boolean indicating if the location is closed on this day
+          * If the boolean is missing or "falsey", then hours.*.closed is set to false and hours.*.open and hours.*.close are set to null.
+          * If the boolean is "truthy", then hours.*.closed is set to true and the hours.*.open and hours.*.close strings are validated and used as before.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                location_id:
+                  type: string
+                  description: The ID of the location
+                hours:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      day:
+                        type: integer
+                        format: int32
+                        description: The day of the week (1-7), Monday being 1
+                      open:
+                        type: string
+                        description: The opening time in HH:MM format
+                      close:
+                        type: string
+                        description: The closing time in HH:MM format
+                      closed:
+                        type: boolean
+                        description: True if the location is closed for this entire day
+      responses:
+        "200":
+          $ref: "#/components/responses/LocationHoursResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "404":
+          $ref: "#/components/responses/ErrorResponse404"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /location-name:
+    get:
+      operationId: getLocationName
+      summary: Retrieve location name
+      parameters:
+        - name: gatewayId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/WashSummary"
+                type: string
         "400":
           $ref: "#/components/responses/ErrorResponse400"
         "401":
@@ -392,33 +2242,706 @@ paths:
           $ref: "#/components/responses/ErrorResponse403"
         "500":
           $ref: "#/components/responses/ErrorResponse500"
-
-  /back-office-wash-package-list:
+  /location-name-data:
     get:
-      summary: Retrieve back office wash package list
-      description: >
-        Retrieves a list of available wash packages for the back office.
-        Requires the location ID as a query parameter.
+      operationId: getLocationNameData
+      summary: (No auth required) Retrieve location name
       parameters:
-        - in: query
-          name: lid
+        - name: gatewayId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /maintenance-events:
+    get:
+      summary: Retrieve maintenance events
+      operationId: getMaintenanceEvents
+      parameters:
+        - name: lid
+          in: query
           schema:
             type: string
             format: uuid
-          required: true
-          description: The unique location ID.
+            description: ID of the location
+        - name: count
+          in: query
+          schema:
+            type: integer
+            description: Limit the number of returned rows
       responses:
         "200":
-          description: Back office wash package list retrieved successfully.
+          $ref: "#/components/responses/MaintenanceEventsResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /maintenance-events-data:
+    get:
+      summary: Retrieve maintenance events
+      operationId: getMaintenanceEventsData
+      parameters:
+        - name: gateway_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: alpha_dash
+            description: Gateway ID of the location
+        - name: count
+          in: query
+          schema:
+            type: integer
+            description: Limit the number of returned rows
+      responses:
+        "200":
+          $ref: "#/components/responses/MaintenanceEventsResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /panel-summary:
+    get:
+      summary: Retrieve panel summary. Raw data is total over `elapsedSecs` period. All values are `SUM`'d when timebucketed.
+      operationId: getPanelSummary
+      parameters:
+        - name: deviceId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: alpha_dash
+        - name: since
+          in: query
+          schema:
+            type: integer
+        - name: count
+          description: >
+            Limit the number of returned rows.
+          in: query
+          schema:
+            type: integer
+            default: 10000
+        - name: bucketMinutes
+          description: >
+            The number of minutes to bucket the data. If this is not included, the raw data will be returned.
+          in: query
+          schema:
+            type: integer
+        - name: start
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          $ref: "#/components/responses/PanelSummaryResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /panel-summary-data:
+    get:
+      summary: (No auth required) Retrieve panel summary. Raw data is total over `elapsedSecs` period. All values are `SUM`'d when timebucketed.
+      operationId: getPanelSummaryData
+      parameters:
+        - name: deviceId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: alpha_dash
+        - name: since
+          in: query
+          schema:
+            type: integer
+        - name: count
+          description: >
+            Limit the number of returned rows.
+          in: query
+          schema:
+            type: integer
+            default: 10000
+        - name: bucketMinutes
+          description: >
+            The number of minutes to bucket the data. If this is not included, the raw data will be returned.
+          in: query
+          schema:
+            type: integer
+        - name: start
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          $ref: "#/components/responses/PanelSummaryResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /profile-picture:
+    post:
+      operationId: updateProfilePicture
+      summary: Upload a profile picture
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Successful operation
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  packages:
+                  profile_picture_url:
+                    type: string
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+    delete:
+      operationId: deleteProfilePicture
+      summary: Delete a profile picture
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /pump-status:
+    get:
+      summary: Retrieve pump status. All data averaged when timebucketed.
+      operationId: getPumpStatus
+      parameters:
+        - name: deviceId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: alpha_dash
+        - name: since
+          in: query
+          schema:
+            type: integer
+        - name: count
+          description: >
+            Limit the number of returned rows.
+          in: query
+          schema:
+            type: integer
+            default: 10000
+        - name: bucketMinutes
+          description: >
+            The number of minutes to bucket the data. If this is not included, the raw data will be returned.
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          $ref: "#/components/responses/PumpStatusResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /pump-status-data:
+    get:
+      summary: (No auth required) Retrieve pump status. All data averaged when timebucketed.
+      operationId: getPumpStatusData
+      parameters:
+        - name: deviceId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: alpha_dash
+        - name: since
+          in: query
+          schema:
+            type: integer
+        - name: count
+          description: >
+            Limit the number of returned rows.
+          in: query
+          schema:
+            type: integer
+            default: 10000
+        - name: bucketMinutes
+          description: >
+            The number of minutes to bucket the data. If this is not included, the raw data will be returned.
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          $ref: "#/components/responses/PumpStatusResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /pump-summary:
+    get:
+      summary: Retrieve pump summary
+      operationId: getPumpSummary
+      parameters:
+        - name: deviceId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: alpha_dash
+        - name: since
+          in: query
+          schema:
+            type: integer
+        - name: count
+          description: >
+            Limit the number of returned rows.
+          in: query
+          schema:
+            type: integer
+            default: 10000
+        - name: bucketMinutes
+          description: >
+            The number of minutes to bucket the data. If this is not included, the raw data will be returned.
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          $ref: "#/components/responses/PumpSummaryResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /pump-summary-data:
+    get:
+      summary: (No auth required) Retrieve pump summary
+      operationId: getPumpSummaryData
+      parameters:
+        - name: deviceId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: alpha_dash
+        - name: since
+          in: query
+          schema:
+            type: integer
+        - name: count
+          description: >
+            Limit the number of returned rows.
+          in: query
+          schema:
+            type: integer
+            default: 10000
+        - name: bucketMinutes
+          description: >
+            The number of minutes to bucket the data. If this is not included, the raw data will be returned.
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          $ref: "#/components/responses/PumpSummaryResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /remove-cookie:
+    get:
+      summary: Remove a specific cookie
+      operationId: removeCookie
+      responses:
+        "200":
+          description: Cookie removed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  body:
+                    type: string
+                    example: ""
+                  cookies:
                     type: array
                     items:
-                      $ref: "#/components/schemas/WashPackageListItem"
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: "HFI_ALFRED_AUTH_TOKEN"
+                        value:
+                          type: string
+                          example: ""
+                        expires:
+                          type: string
+                          format: date-time
+                          example: "1970-01-01T00:00:00.000Z"
+                        httpOnly:
+                          type: boolean
+                          example: true
+                        secure:
+                          type: boolean
+                          example: true
+                        sameSite:
+                          type: string
+                          example: "none"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /sensor-data:
+    get:
+      summary: Retrieve sensor data
+      operationId: getSensorData
+      parameters:
+        - name: gatewayID
+          in: query
+          required: true
+          schema:
+            type: string
+            format: alpha_dash
+        - name: start
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          $ref: "#/components/responses/SensorDataResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+              examples:
+                validationError:
+                  summary: Validation Error
+                  value:
+                    code: 400
+                    message: A field is not valid.
+                validSensorsError:
+                  summary: No valid sensors
+                  value:
+                    code: 400
+                    message: No valid sensors found for the given gateway.
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /set-cookie:
+    post:
+      summary: Set a specific cookie
+      operationId: setCookie
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dev_key:
+                  type: string
+      parameters:
+        - name: x-forwarded-proto
+          in: header
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cookie set successfully
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: "HFI_ALFRED_AUTH_TOKEN=auth_token; Max-Age=3888000; HttpOnly; Secure; SameSite=None"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /system-alert-block-list:
+    post:
+      summary: Update system alert block list
+      operationId: updateSystemAlertBlockList
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                system_alerts_block_list:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: System alert block list updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  system_alerts_block_list:
+                    type: array
+                    items:
+                      type: string
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /system-alert-summary:
+    get:
+      summary: Retrieve system alert summary
+      operationId: getSystemAlertSummary
+      parameters:
+        - name: lid
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: since
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: count
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: totalCount
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: locationCount
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          $ref: "#/components/responses/SystemAlertSummaryResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /system-alert-summary-data:
+    get:
+      summary: Retrieve system alert summary
+      operationId: getSystemAlertSummaryData
+      parameters:
+        - name: gateway_ids
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              format: alpha_dash
+        - name: since
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: count
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: totalCount
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: locationCount
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          $ref: "#/components/responses/SystemAlertSummaryResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /total-valve-cycles:
+    get:
+      summary: Retrieve total valve cycles
+      operationId: getTotalValveCycles
+      parameters:
+        - name: deviceId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/TotalValveCyclesResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /total-valve-cycles-data:
+    get:
+      summary: Retrieve total valve cycles
+      operationId: getTotalValveCyclesData
+      parameters:
+        - name: deviceId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/TotalValveCyclesResponse"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /user:
+    post:
+      summary: Modify user information
+      operationId: postUser
+      requestBody:
+        description: User information to modify
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                  description: ID of the user to retrieve
+                phone:
+                  type: string
+                  description: Phone number of the user as numbers optionally preceded by a plus sign
+      responses:
+        "200":
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  system_alerts_block_list:
+                    type: array
+                    items:
+                      type: string
+                  wants_email:
+                    type: boolean
+                  wants_push:
+                    type: boolean
+                  business_id:
+                    type: string
+                  business_name:
+                    type: string
+                  role_type:
+                    type: string
+                  locations:
+                    type: array
+                    items:
+                      type: string
+                      description: Location ID
+                  phone:
+                    type: string
         "400":
           $ref: "#/components/responses/ErrorResponse400"
         "401":
@@ -426,7 +2949,720 @@ paths:
         "403":
           $ref: "#/components/responses/ErrorResponse403"
         "404":
-          description: No packages found.
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /user-invite:
+    post:
+      summary: Invite a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                role_type:
+                  type: string
+                  enum: ["admin", "member"]
+                name:
+                  type: string
+                locs:
+                  type: array
+                  items:
+                    type: string
+              required:
+                - email
+                - role_type
+                - name
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  auth0_id:
+                    type: string
+                  system_alerts_block_list:
+                    type: string
+                  wants_email:
+                    type: boolean
+                  wants_push:
+                    type: boolean
+                  role_type:
+                    type: string
+                  business_id:
+                    type: string
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /user-locations:
+    get:
+      summary: Retrieve user and their related business and location information
+      operationId: getUserLocations
+      responses:
+        "200":
+          description: User and related business and location information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  system_alerts_block_list:
+                    type: array
+                    items:
+                      type: string
+                  wants_email:
+                    type: boolean
+                  wants_push:
+                    type: boolean
+                  business_id:
+                    type: string
+                  business_name:
+                    type: string
+                  role_type:
+                    type: string
+                  locations:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        address:
+                          type: string
+                        city:
+                          type: string
+                        region:
+                          type: string
+                        postal_code:
+                          type: string
+                        phone:
+                          type: string
+                        description:
+                          type: string
+                        coordinates:
+                          type: array
+                          items:
+                            type: number
+                        water_cost_per_gallon:
+                          type: number
+                          format: float
+                          description: The water cost per gallon, expected to be a number with two digits after the decimal point.
+                        currency_code:
+                          type: number
+                          pattern: "^[A-Z0-9]{3}$"
+                          description: ISO 4217 currency code
+                        hours:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              day:
+                                type: integer
+                                format: int32
+                                description: The day of the week (1-7), Monday being 1
+                              open:
+                                type: string
+                                description: The opening time in HH:MM format
+                              close:
+                                type: string
+                                description: The closing time in HH:MM format
+                        created_at:
+                          type: string
+                          format: date-time
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /user-remove:
+    post:
+      summary: Remove a user from a business
+      operationId: removeUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  description: ID of the user to remove
+      responses:
+        "200":
+          description: User removed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                    format: uuid
+                  business_id:
+                    type: string
+                  message:
+                    type: string
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+              examples:
+                validationError:
+                  summary: Validation Error
+                  value:
+                    code: 400
+                    message: A field is not valid.
+                validSensorsError:
+                  summary: Invalid permissions
+                  value:
+                    code: 400
+                    message: The logged in user cannot remove themself
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /user-update-notifications:
+    post:
+      summary: Update user notification preferences for email and push notifications
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                wants_email:
+                  type: boolean
+                  description: Whether the user wants email notifications
+                wants_push:
+                  type: boolean
+                  description: Whether the user wants push notifications
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          $ref: "#/components/responses/ErrorResponse404"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /user-verify-email:
+    post:
+      summary: Send a user email verification
+      operationId: verifyUserEmail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  description: ID of the user to verify
+      responses:
+        "200":
+          description: Email verification sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  email:
+                    type: string
+                  name:
+                    type: string
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /users:
+    get:
+      summary: Get all users in your business
+      operationId: getUsers
+      responses:
+        "200":
+          description: Successfully found users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user_id:
+                          type: string
+                          format: uuid
+                          description: ID of the user
+                        name:
+                          type: string
+                        picture:
+                          type: string
+                          description: url to picture
+                        nickname:
+                          type: string
+                        updated_at:
+                          type: string
+                          format: date-time
+                        created_at:
+                          type: string
+                          format: date-time
+                        last_password_reset:
+                          type: string
+                          format: date-time
+                        email:
+                          type: string
+                        email_verified:
+                          type: boolean
+                        identities:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              user_id:
+                                type: string
+                              provider:
+                                type: string
+                              isSocial:
+                                type: boolean
+                              connection:
+                                type: string
+                        last_login:
+                          type: string
+                          format: date-time
+                        last_ip:
+                          type: string
+                          format: date-time
+                        logins_count:
+                          type: integer
+                        auth0_id:
+                          type: string
+                        system_alerts_block_list:
+                          type: array
+                          items:
+                            type: string
+                        wants_email:
+                          type: boolean
+                        wants_push:
+                          type: boolean
+                        role_type:
+                          type: string
+                        locs:
+                          type: array
+                          items:
+                            type: string
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+              examples:
+                validationError:
+                  summary: No users found
+                  value:
+                    code: 404
+                    message: No users found.
+                validSensorsError:
+                  summary: Role type error
+                  value:
+                    code: 404
+                    message: Unrecognized `role_type`
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+              examples:
+                validationError:
+                  summary: Internal server error
+                  value:
+                    code: 500
+                    message: Internal server error
+                validSensorsError:
+                  summary: Auth0 Error
+                  value:
+                    code: 500
+                    message: Auth0 User Fetch Issue
+  /valve-maintenance:
+    post:
+      summary: Update a maintenance event
+      operationId: updateMaintenanceEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                maintenanceId:
+                  type: string
+                  format: uuid
+                  description: ID of the maintenance event to update
+      responses:
+        "200":
+          $ref: "#/components/responses/ValveMaintenanceResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+              examples:
+                validationError:
+                  summary: Validation Error
+                  value:
+                    code: 400
+                    message: A field is not valid.
+                validSensorsError:
+                  summary: Cannot find maintenance event
+                  value:
+                    code: 400
+                    message: This maintenance event does not exist, was deleted, or replaced by an updated maintenance event."
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /valve-maintenance-data:
+    post:
+      summary: Update a maintenance event
+      operationId: updateMaintenanceEventData
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                maintenanceId:
+                  type: string
+                  format: uuid
+                  description: ID of the maintenance event to update
+                userId:
+                  type: string
+                  format: uuid
+                  description: ID of the user who is doing the updating.
+      responses:
+        "200":
+          $ref: "#/components/responses/ValveMaintenanceResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+              examples:
+                validationError:
+                  summary: Validation Error
+                  value:
+                    code: 400
+                    message: A field is not valid.
+                validSensorsError:
+                  summary: Cannot find maintenance event
+                  value:
+                    code: 400
+                    message: This maintenance event does not exist, was deleted, or replaced by an updated maintenance event."
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /vanity-stats:
+    get:
+      summary: Retrieve vanity statistics
+      operationId: getVanityStats
+      responses:
+        "200":
+          description: Vanity statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalValveCycles:
+                    type: integer
+                  secondsInOperation:
+                    type: integer
+                  dollarsSavedThisYear:
+                    type: integer
+                  centsSavedPerSecond:
+                    type: integer
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /wash-package:
+    get:
+      operationId: getWashPackages
+      summary: Retrieve wash packages
+      parameters:
+        - name: gatewayId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WashPackage"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          description: Method does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+    post:
+      operationId: createWashPackages
+      summary: Create a new wash package
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WashPackageInput"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  washPackageId:
+                    type: string
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          description: Method does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+    put:
+      operationId: updateWashPackages
+      summary: Update a wash package
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WashPackageInput"
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          description: Method does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+    delete:
+      operationId: deleteWashPackages
+      summary: Delete a wash package
+      parameters:
+        - name: washPackageId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          description: Method does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+  /wash-package-data:
+    get:
+      operationId: getWashPackagesData
+      summary: (No auth required) Retrieve wash packages
+      parameters:
+        - name: gatewayId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WashPackage"
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "404":
+          description: Method does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+    post:
+      operationId: createWashPackagesData
+      summary: (No auth required) Create a new wash package
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WashPackageInput"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  washPackageId:
+                    type: string
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "404":
+          description: Method does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+    put:
+      operationId: updateWashPackagesData
+      summary: (No auth required) Update a wash package
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WashPackageInput"
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "404":
+          description: Method does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorProperties"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
+    delete:
+      operationId: deleteWashPackagesData
+      summary: (No auth required) Delete a wash package
+      parameters:
+        - name: washPackageId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "404":
+          description: Method does not exist
           content:
             application/json:
               schema:
