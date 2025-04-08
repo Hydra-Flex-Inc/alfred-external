@@ -159,7 +159,7 @@ components:
           type: integer
         a_la_carte:
           type: boolean
-  
+
   responses:
     ErrorResponse400:
       description: "Bad Request"
@@ -196,6 +196,75 @@ security:
   - cookieAuth: []
 
 paths:
+  /add-water-source-id-data:
+    post:
+      summary: Add water source ID
+      description: >
+        Adds a water source ID to the chemical container.
+        The request body must include the container ID and the water source ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                container_id:
+                  type: string
+                  format: uuid
+                water_source_id:
+                  type: string
+                  format: uuid
+      responses:
+        "200":
+          description: Water source ID added successfully.
+          content:
+            application/json:
+              schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  modbus_id:
+                    type: integer
+                  name:
+                    type: string
+                  position:
+                    type: integer
+                  iot_hub_device_id:
+                    type: string
+                  type:
+                    type: string
+                  software_version:
+                    type: string
+                  hardware_version:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                  deleted_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                  water_source_id:
+                    type: string
+                    format: uuid
+        "400":
+          $ref: "#/components/responses/ErrorResponse400"
+        "401":
+          $ref: "#/components/responses/ErrorResponse401"
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
+          $ref: "#/components/responses/ErrorResponse404"
+        "500":
+          $ref: "#/components/responses/ErrorResponse500"
   /location-hours:
     post:
       summary: Update location hours
@@ -210,7 +279,7 @@ paths:
             schema:
               $ref: "#/components/schemas/LocationHours"
       responses:
-        '200':
+        "200":
           description: Location hours updated successfully.
           content:
             application/json:
@@ -220,17 +289,17 @@ paths:
                   success:
                     type: boolean
                     example: true
-        '400':
+        "400":
           $ref: "#/components/responses/ErrorResponse400"
-        '401':
+        "401":
           $ref: "#/components/responses/ErrorResponse401"
-        '403':
-          $ref: "#/components/responses/ErrorResponse403" 
-        '404':
+        "403":
+          $ref: "#/components/responses/ErrorResponse403"
+        "404":
           $ref: "#/components/responses/ErrorResponse404"
-        '500':
+        "500":
           $ref: "#/components/responses/ErrorResponse500"
-          
+
   /location-hours-data:
     post:
       summary: Update location hours (no auth required)
@@ -246,7 +315,7 @@ paths:
             schema:
               $ref: "#/components/schemas/LocationHours"
       responses:
-        '200':
+        "200":
           description: Location hours updated successfully.
           content:
             application/json:
@@ -267,16 +336,16 @@ paths:
                     closed:
                       type: boolean
                       description: True if the location is closed for this entire day
-        '400':
+        "400":
           $ref: "#/components/responses/ErrorResponse400"
-        '404':
+        "404":
           $ref: "#/components/responses/ErrorResponse404"
-        '500':
+        "500":
           $ref: "#/components/responses/ErrorResponse500"
 
   /wash-summary:
     get:
-      summary: Retrieve wash summary 
+      summary: Retrieve wash summary
       description: >
         Retrieves a time-series summary of wash data.
         Query parameters include the location ID, a start date, an end date, and the desired date grouping (day, week, month).
@@ -309,19 +378,19 @@ paths:
             enum: [day, week, month]
           description: Date grouping format for the wash summary.
       responses:
-        '200':
+        "200":
           description: Wash summary retrieved successfully.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/WashSummary"
-        '400':
+        "400":
           $ref: "#/components/responses/ErrorResponse400"
-        '401':
+        "401":
           $ref: "#/components/responses/ErrorResponse401"
-        '403':
+        "403":
           $ref: "#/components/responses/ErrorResponse403"
-        '500':
+        "500":
           $ref: "#/components/responses/ErrorResponse500"
 
   /back-office-wash-package-list:
@@ -339,7 +408,7 @@ paths:
           required: true
           description: The unique location ID.
       responses:
-        '200':
+        "200":
           description: Back office wash package list retrieved successfully.
           content:
             application/json:
@@ -350,17 +419,17 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/WashPackageListItem"
-        '400':
+        "400":
           $ref: "#/components/responses/ErrorResponse400"
-        '401':
+        "401":
           $ref: "#/components/responses/ErrorResponse401"
-        '403':
+        "403":
           $ref: "#/components/responses/ErrorResponse403"
-        '404':
+        "404":
           description: No packages found.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorProperties"
-        '500':
+        "500":
           $ref: "#/components/responses/ErrorResponse500"

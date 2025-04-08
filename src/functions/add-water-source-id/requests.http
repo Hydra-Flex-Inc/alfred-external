@@ -1,0 +1,6 @@
+POST http://localhost:7071/api/add-water-source-id-data
+
+{
+  "water_source_id": "1C4944AB-E168-4DFC-9431-FCAB34D3F31C",
+  "component_id": "4a5e53d4-0c9c-4fde-827a-db208523b13d"
+}
