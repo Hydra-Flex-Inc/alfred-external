@@ -124,7 +124,8 @@ app.http("location-components-data", {
         c.modbus_id AS component_modbus_id,
         c.position AS component_position,
         c.type AS component_type,
-        c.name AS component_name
+        c.name AS component_name,
+        c.water_source_id AS water_source_id
       FROM
         gateways g
         LEFT JOIN components c
@@ -156,6 +157,7 @@ app.http("location-components-data", {
           position: row.component_position,
           type: row.component_type,
           name: row.component_name,
+          water_source_id: row.water_source_id,
         });
       });
 
