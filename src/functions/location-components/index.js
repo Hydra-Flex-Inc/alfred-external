@@ -102,7 +102,7 @@ app.http("location-components-data", {
 
       // Validate input.
       const validator = new Validator(req.req_query, {
-        location_id: "required|uuid",
+        gateway_id: "required|alpha_dash",
       });
 
       if (validator.fails()) {
@@ -110,9 +110,9 @@ app.http("location-components-data", {
       }
 
       // prepare params
-      const params = [req.req_query.location_id];
+      const params = [req.req_query.gateway_id];
       const predicates = [
-        "g.location_id = $1",
+        "g.iot_hub_device_id = $1",
         "g.deleted_at IS NULL",
         "c.deleted_at IS NULL",
       ];
