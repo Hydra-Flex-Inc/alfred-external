@@ -8,5 +8,5 @@ Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
 
 ### No auth call
 GET http://localhost:7071/api/location-components-data
-    ?location_id=afc0ef89-119a-409e-9c02-a7a048786062
+    ?2335/=advm2-sensor-trial
 content-type: application/json
