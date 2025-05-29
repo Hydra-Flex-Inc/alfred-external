@@ -1,5 +1,4 @@
 ### Good request
-
 GET http://localhost:7071/api/adoption-code-check
 ?adoption_code=3Mx9V
 content-type: application/json
