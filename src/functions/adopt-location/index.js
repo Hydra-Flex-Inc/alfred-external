@@ -207,22 +207,21 @@ app.http("adopt-location-data", {
 
       // Validate input
       const validator = new Validator(body, {
-        location_name: "required|freeflow",
         adoption_code: "required|alpha_num",
+        gateway_id: "required|alpha_dash",
       });
 
       if (validator.fails()) {
         throw validator.errors;
       }
 
-      const client = await db.getClient();
-
       // Retrieve information regarding this adoption code, and validate that this is a valid usage of this adoption code.
 
       // prepare params
-      const params = [body.adoption_code];
+      const params = [body.adoption_code, body.gateway_id];
       const predicates = [
         "lac.code = $1",
+        "g.iot_hub_device_id = $2",
         "lac.deleted_at IS NULL",
         "l.deleted_at IS NULL",
       ];
@@ -235,14 +234,17 @@ app.http("adopt-location-data", {
         l.city,
         l.region,
         l.postal_code,
-        l.description,
         l.coordinates,
+        g.iot_hub_device_id as gateway_id,
         lac.used_on_date as code_used_on_date,
-        lac.valid_thru as code_valid_thru
+        lac.valid_thru as code_valid_thru,
+        lac.code as adoption_code
       FROM
         locations l
         LEFT JOIN location_adoption_codes lac
           ON l.id = lac.location_id
+        LEFT JOIN gateways g
+          ON l.id = g.location_id
       WHERE ${predicates.join(" AND ")}
       `;
       let result = await db.query(query, params);
@@ -272,21 +274,9 @@ app.http("adopt-location-data", {
         throw error;
       }
 
-      // Start a transaction, since we'll be updating several tables across multiple queries.
-      await client.query("BEGIN");
-
-      await client.query(
-        `
-     UPDATE locations
-     display_name = $1
-     WHERE id = $2
-   `,
-        [body.location_name, location.id]
-      );
-
       // Mark the adoption code as used.
       const now = Math.floor(Date.now() / 1000); // Convert current time from ms to seconds.
-      await client.query(
+      await db.query(
         `
       UPDATE location_adoption_codes
       SET used_on_date = $1
@@ -296,20 +286,10 @@ app.http("adopt-location-data", {
         [now, body.adoption_code, location.id]
       );
 
-      // If all queries were successful, commit.
-      await client.query("COMMIT");
-
-      // We can also release the client
-      client.release();
+      const {id, code_used_on_date, code_valid_thru, ...out} = location;
 
       return {
-        body: JSON.stringify({
-          adoption_code: body.adoption_code,
-          location: {
-            ...location,
-            name: body.location_name,
-          }
-        }),
+        body: JSON.stringify(out),
         headers: {
           "Content-Type": "application/json",
         },
