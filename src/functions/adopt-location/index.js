@@ -196,3 +196,106 @@ app.http("adopt-location", {
     }
   },
 });
+
+app.http("adopt-location-data", {
+  methods: ["POST"],
+  handler: async (req, context) => {
+    try {
+      req = Common.parseRequest(req);
+
+      const body = await req.json();
+
+      // Validate input
+      const validator = new Validator(body, {
+        adoption_code: "required|alpha_num",
+        gateway_id: "required|alpha_dash",
+      });
+
+      if (validator.fails()) {
+        throw validator.errors;
+      }
+
+      // Retrieve information regarding this adoption code, and validate that this is a valid usage of this adoption code.
+
+      // prepare params
+      const params = [body.adoption_code, body.gateway_id];
+      const predicates = [
+        "lac.code = $1",
+        "g.iot_hub_device_id = $2",
+        "lac.deleted_at IS NULL",
+        "l.deleted_at IS NULL",
+      ];
+
+      const query = `
+      SELECT
+        l.id,
+        l.display_name as name,
+        l.address,
+        l.city,
+        l.region,
+        l.postal_code,
+        l.coordinates,
+        g.iot_hub_device_id as gateway_id,
+        lac.used_on_date as code_used_on_date,
+        lac.valid_thru as code_valid_thru,
+        lac.code as adoption_code
+      FROM
+        locations l
+        LEFT JOIN location_adoption_codes lac
+          ON l.id = lac.location_id
+        LEFT JOIN gateways g
+          ON l.id = g.location_id
+      WHERE ${predicates.join(" AND ")}
+      `;
+      let result = await db.query(query, params);
+
+      if (!result.rowCount) {
+        const error = new Error(
+          "Sorry, this doesn't seem to be a valid adoption code."
+        );
+        error.status = 400;
+        throw error;
+      }
+
+      const location = result.rows.pop();
+
+      if (location.code_used_on_date) {
+        const error = new Error(
+          "Sorry, this adoption code has already been used."
+        );
+        error.status = 400;
+        throw error;
+      } else if (
+        location.code_valid_thru &&
+        location.code_valid_thru * 1000 < Date.now()
+      ) {
+        const error = new Error("Sorry, this adoption code has expired.");
+        error.status = 400;
+        throw error;
+      }
+
+      // Mark the adoption code as used.
+      const now = Math.floor(Date.now() / 1000); // Convert current time from ms to seconds.
+      await db.query(
+        `
+      UPDATE location_adoption_codes
+      SET used_on_date = $1
+      WHERE code = $2
+      AND location_id = $3
+    `,
+        [now, body.adoption_code, location.id]
+      );
+
+      const {id, code_used_on_date, code_valid_thru, ...out} = location;
+
+      return {
+        body: JSON.stringify(out),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+    } catch (error) {
+      return ErrorHandler.prepareResponse(context, error);
+    }
+  },
+});
