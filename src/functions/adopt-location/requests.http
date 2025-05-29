@@ -5,6 +5,16 @@ content-type: application/json
 Cookie: HFI_ALFRED_AUTH_TOKEN=1c48231c-ca48-4873-96b2-a0371a10cbc3
 
 {
-  "location_name": "required|freeflow",
-  "adoption_code": "required|alpha_num"
+  "location_name": "Justus' Home",
+  "adoption_code": "nPv9b"
+}
+
+### Good request, no auth
+### Create a new record in the locations and location_adoption_codes tables, then run this query
+POST http://localhost:7071/api/adopt-location-data
+content-type: application/json
+
+{
+  "adoption_code": "nPv9b",
+  "gateway_id": "012320EBFD559D0AEE"
 }
