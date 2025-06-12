@@ -44,3 +44,10 @@ jobs:
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
           slot-name: "production"
+
+  purge-edge-cache:
+  needs: build-and-deploy
+  runs-on: ubuntu-latest
+  steps:
+  - name: Cloudflare Purge Cache
+    uses: jakejarvis/cloudflare-purge-action@v0.3.0
