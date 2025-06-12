@@ -46,8 +46,8 @@ jobs:
           slot-name: "production"
 
   purge-edge-cache:
-  needs: build-and-deploy
-  runs-on: ubuntu-latest
-  steps:
-  - name: Cloudflare Purge Cache
-    uses: jakejarvis/cloudflare-purge-action@v0.3.0
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cloudflare Purge Cache
+        uses: jakejarvis/cloudflare-purge-action@v0.3.0
