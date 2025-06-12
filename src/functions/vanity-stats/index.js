@@ -6,7 +6,7 @@ const ErrorHandler = require("../../../errorHandler");
 // Does not use auth
 
 app.http("vanity-stats", {
-  methods: ["GET"],
+  methods: ["GET", "HEAD"],
   handler: async (req, context) => {
     try {
       req = Common.parseRequest(req);

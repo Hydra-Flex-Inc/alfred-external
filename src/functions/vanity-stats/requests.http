@@ -4,9 +4,21 @@ GET http://localhost:7071/api/vanity-stats
 content-type: application/json
 
 
+### Simple, with HEAD
+
+HEAD http://localhost:7071/api/vanity-stats
+content-type: application/json
+
+
 ### Prod, no auth
 
-GET https://alfred-api.hydraflexinc.com/alfred/vanity-stats
+GET https://alfred-api.hydraflexinc.com/alfred-v2/vanity-stats
+content-type: application/json
+
+
+### Uptime Robot
+
+HEAD https://alfred-api.hydraflexinc.com/alfred-v2/vanity-stats
 content-type: application/json
 
 
