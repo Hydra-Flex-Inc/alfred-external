@@ -1,0 +1,46 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "AzureWebJobsSendGridApiKey": "",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "NO_PROXY": "localhost,127.0.0.1",
+
+    "PGHOST": "(database url or ip goes here)",
+    "PGUSER": "(database user and database name e.g. user@name)",
+    "PGPASSWORD": "(database password goes here)",
+    "PGDATABASE": "sensor_data",
+    "PGPORT": "5432",
+    "PGSSLMODE": "require",
+
+    "TSDBHOST": "secret",
+    "TSDBUSER": "secret",
+    "TSDBPASSWORD": "secret",
+    "TSDBDATABASE": "secret",
+    "TSDBPORT": "32787",
+
+    "AUTH0_DOMAIN": "",
+    "AUTH0_CLIENT_ID": "",
+    "AUTH0_CLIENT_SECRET": "",
+
+    "MAIL_FROM_NAME": "Alfred by Hydra-Flex",
+    "MAIL_FROM_EMAIL": "alfred@hydraflexinc.com",
+    "MAIL_ENVIRONMENT": "development",
+    "MAIL_NON_PRODUCTION_EMAIL": "(your work email goes here)",
+
+    "SONNYS_SUPPORT_API_KEY": "",
+    "SONNYS_SUPPORT_SUBDOMAIN": "",
+    "SONNYS_SUPPORT_ALLOW_SELF_SIGNED_CERT": "",
+
+    "AZURE_STORAGE_CONNECTION_STRING": "secret",
+    "AZURE_STORAGE_CONTAINER_NAME": "profile-pictures",
+    "AZURE_STORAGE_CDN_URL": "secret",
+
+    "AUTHORIZED_DEV_KEY": ""
+  },
+  "Host": {
+    "LocalHttpPort": 7071,
+    "CORS": "https://localhost:3000",
+    "CORSCredentials": true
+  }
+}
